@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240913172333_AddReviewTable")]
+    partial class AddReviewTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,30 +24,6 @@ namespace Repositories.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Models.Area", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Areas");
-                });
 
             modelBuilder.Entity("Models.Booking", b =>
                 {
@@ -90,63 +69,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Memberships");
-                });
-
-            modelBuilder.Entity("Models.Pod", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AreaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PodTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaId");
-
-                    b.HasIndex("PodTypeId");
-
-                    b.ToTable("Pods");
-                });
-
-            modelBuilder.Entity("Models.PodType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PodTypes");
                 });
 
             modelBuilder.Entity("Models.Product", b =>
@@ -317,25 +239,6 @@ namespace Repositories.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Models.Pod", b =>
-                {
-                    b.HasOne("Models.Area", "Area")
-                        .WithMany("Pods")
-                        .HasForeignKey("AreaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Models.PodType", "PodType")
-                        .WithMany("Pods")
-                        .HasForeignKey("PodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Area");
-
-                    b.Navigation("PodType");
-                });
-
             modelBuilder.Entity("Models.Review", b =>
                 {
                     b.HasOne("Models.Booking", "Booking")
@@ -383,11 +286,6 @@ namespace Repositories.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Models.Area", b =>
-                {
-                    b.Navigation("Pods");
-                });
-
             modelBuilder.Entity("Models.Booking", b =>
                 {
                     b.Navigation("Review")
@@ -399,11 +297,6 @@ namespace Repositories.Migrations
             modelBuilder.Entity("Models.Membership", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Models.PodType", b =>
-                {
-                    b.Navigation("Pods");
                 });
 
             modelBuilder.Entity("Models.Product", b =>

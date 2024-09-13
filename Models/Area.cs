@@ -8,19 +8,15 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public class Booking
+    public class Area
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int Price { get; set; }
-        public int Status { get; set; }
+        public string? Name { get; set; }
+        public string Description { get; set; }
+        public string Location { get; set; }
 
-        public int UserId { get; set; }
-        public User User { get; set; }
-
-        public ICollection<SelectedProduct> SelectedProducts { get; set; }
-
-        public Review Review { get; set; }
+        public ICollection<Pod> Pods { get; set; }
     }
 }

@@ -41,6 +41,10 @@ namespace Repositories
         public virtual DbSet<Transaction> Transactions { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<SelectedProduct> SelectedProducts { get; set; }
+        public virtual DbSet<Review> Reviews { get; set; }
+        public virtual DbSet<Pod> Pods { get; set; }
+        public virtual DbSet<PodType> PodTypes { get; set; }
+        public virtual DbSet<Area> Areas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,6 +75,21 @@ namespace Repositories
                 .HasOne(u => u.Booking)
                 .WithMany(r => r.SelectedProducts)
                 .HasForeignKey(u => u.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Review)  // One booking has one review
+                .WithOne(r => r.Booking)  // One review belongs to one booking
+                .HasForeignKey<Review>(r => r.BookingId)  // Foreign key in Review table
+                .OnDelete(DeleteBehavior.Cascade); // Optional: Specify cascading delete behavior
+            modelBuilder.Entity<Pod>()
+                .HasOne(u => u.PodType)
+                .WithMany(r => r.Pods)
+                .HasForeignKey(u => u.PodTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Pod>()
+                .HasOne(u => u.Area)
+                .WithMany(r => r.Pods)
+                .HasForeignKey(u => u.AreaId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
