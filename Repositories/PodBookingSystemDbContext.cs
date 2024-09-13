@@ -38,6 +38,9 @@ namespace Repositories
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Membership> Memberships { get; set; }
         public virtual DbSet<Booking> Bookings { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
+        public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<SelectedProduct> SelectedProducts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,6 +61,16 @@ namespace Repositories
                 .HasOne(u => u.User)
                 .WithMany(r => r.Bookings)
                 .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SelectedProduct>()
+                .HasOne(u => u.Product)
+                .WithMany(r => r.SelectedProducts)
+                .HasForeignKey(u => u.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SelectedProduct>()
+                .HasOne(u => u.Booking)
+                .WithMany(r => r.SelectedProducts)
+                .HasForeignKey(u => u.BookingId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
