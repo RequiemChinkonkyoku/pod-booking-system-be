@@ -18,8 +18,13 @@ namespace Models
         public string? Password { get; set; }
         public string? PasswordHash { get; set; }
         public int? Status { get; set; }
+
         public int? MembershipId { get; set; }
+        public Membership Membership { get; set; }
+
         public int? RoleId { get; set; }
         public Role Role { get; set; }
+
+        public ICollection<Booking> Bookings { get; set; }
     }
 }

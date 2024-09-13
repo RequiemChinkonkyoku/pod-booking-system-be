@@ -36,6 +36,8 @@ namespace Repositories
         //DbSet for custom entities
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<Membership> Memberships { get; set; }
+        public virtual DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +49,16 @@ namespace Repositories
                 .WithMany(r => r.Users)  // One role has many users
                 .HasForeignKey(u => u.RoleId)  // Foreign key in User table
                 .OnDelete(DeleteBehavior.Restrict); // Optional: Prevent cascading delete
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Membership)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.MembershipId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Booking>()
+                .HasOne(u => u.User)
+                .WithMany(r => r.Bookings)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
