@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "PodBookingSystemDB": "server=(local); database=PodBookingSystemDB; uid=sa; pwd=12345; Trusted_Connection=True; TrustServerCertificate=True"
+  }
+}
