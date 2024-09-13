@@ -35,10 +35,18 @@ namespace Repositories
 
         //DbSet for custom entities
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Configure one-to-many relationship
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Role)  // One user has one role
+                .WithMany(r => r.Users)  // One role has many users
+                .HasForeignKey(u => u.RoleId)  // Foreign key in User table
+                .OnDelete(DeleteBehavior.Restrict); // Optional: Prevent cascading delete
         }
     }
 }
