@@ -8,19 +8,15 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public class Transaction
+    public class Schedule
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public DateTime PaymentTime { get; set; }
-        public int TotalPrice { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public int Status { get; set; }
 
-        public int MethodId { get; set; }
-        public Method Method { get; set; }
-
-        public int BookingId { get; set; }
-        public Booking Booking { get; set; }
+        public ICollection<Slot> Slots { get; set; }
     }
 }

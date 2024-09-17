@@ -22,5 +22,7 @@ namespace Models
 
         public int AreaId { get; set; }
         public Area Area { get; set; }
+
+        public ICollection<Slot> Slots { get; set; }
     }
 }

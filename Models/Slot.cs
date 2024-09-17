@@ -8,19 +8,20 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public class Transaction
+    public class Slot
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public DateTime PaymentTime { get; set; }
-        public int TotalPrice { get; set; }
         public int Status { get; set; }
+        
+        public int? ScheduleId { get; set; }
+        public Schedule Schedule { get; set; }
 
-        public int MethodId { get; set; }
-        public Method Method { get; set; }
+        public int? PodId { get; set; }
+        public Pod Pod { get; set; }
 
-        public int BookingId { get; set; }
-        public Booking Booking { get; set; }
+        public int? BookingDetailId { get; set; }
+        public BookingDetail BookingDetail { get; set; }
     }
 }

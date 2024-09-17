@@ -21,6 +21,10 @@ namespace Models
 
         public ICollection<SelectedProduct> SelectedProducts { get; set; }
 
+        public ICollection<BookingDetail> BookingDetails { get; set; }
+
+        public ICollection<Transaction> Transactions { get; set; }
+
         public Review Review { get; set; }
     }
 }

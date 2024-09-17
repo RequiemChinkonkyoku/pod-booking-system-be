@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240917063110_AddBookingDetail")]
+    partial class AddBookingDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,23 +117,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Memberships");
-                });
-
-            modelBuilder.Entity("Models.Method", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Methods");
                 });
 
             modelBuilder.Entity("Models.Pod", b =>
@@ -359,26 +345,7 @@ namespace Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MethodId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PaymentTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalPrice")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("MethodId");
 
                     b.ToTable("Transactions");
                 });
@@ -516,25 +483,6 @@ namespace Repositories.Migrations
                     b.Navigation("Schedule");
                 });
 
-            modelBuilder.Entity("Models.Transaction", b =>
-                {
-                    b.HasOne("Models.Booking", "Booking")
-                        .WithMany("Transactions")
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Models.Method", "Method")
-                        .WithMany("Transactions")
-                        .HasForeignKey("MethodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("Method");
-                });
-
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.HasOne("Models.Membership", "Membership")
@@ -565,8 +513,6 @@ namespace Repositories.Migrations
                         .IsRequired();
 
                     b.Navigation("SelectedProducts");
-
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Models.BookingDetail", b =>
@@ -578,11 +524,6 @@ namespace Repositories.Migrations
             modelBuilder.Entity("Models.Membership", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Models.Method", b =>
-                {
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Models.Pod", b =>

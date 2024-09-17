@@ -45,6 +45,10 @@ namespace Repositories
         public virtual DbSet<Pod> Pods { get; set; }
         public virtual DbSet<PodType> PodTypes { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
+        public virtual DbSet<Slot> Slots { get; set; }
+        public virtual DbSet<Schedule> Schedules { get; set; }
+        public virtual DbSet<BookingDetail> BookingsDetails { get; set; }
+        public virtual DbSet<Method> Methods { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -90,6 +94,36 @@ namespace Repositories
                 .HasOne(u => u.Area)
                 .WithMany(r => r.Pods)
                 .HasForeignKey(u => u.AreaId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Slot>()
+                .HasOne(u => u.Schedule)
+                .WithMany(r => r.Slots)
+                .HasForeignKey(u => u.ScheduleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Slot>()
+                .HasOne(u => u.Pod)
+                .WithMany(r => r.Slots)
+                .HasForeignKey(u => u.PodId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<BookingDetail>()
+                .HasOne(u => u.Booking)
+                .WithMany(r => r.BookingDetails)
+                .HasForeignKey(u => u.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<BookingDetail>()
+                .HasOne(u => u.Slot)
+                .WithOne(r => r.BookingDetail)
+                .HasForeignKey<Slot>(r => r.BookingDetailId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Transaction>()
+                .HasOne(u => u.Method)
+                .WithMany(r => r.Transactions)
+                .HasForeignKey(u => u.MethodId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Transaction>()
+                .HasOne(u => u.Booking)
+                .WithMany(r => r.Transactions)
+                .HasForeignKey(u => u.BookingId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
