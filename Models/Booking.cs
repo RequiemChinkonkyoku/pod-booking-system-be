@@ -13,8 +13,11 @@ namespace Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int Price { get; set; }
-        public int Status { get; set; }
+        public int BookingPrice { get; set; }
+        public DateTime CreatedTime { get; set; }
+
+        public int BookingStatusId { get; set; }
+        public BookingStatus BookingStatus { get; set; }
 
         public int UserId { get; set; }
         public User User { get; set; }

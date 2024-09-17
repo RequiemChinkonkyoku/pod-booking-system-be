@@ -8,21 +8,13 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public class Product
+    public class Category
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; }
-        public int Price { get; set; }
-        public string Description { get; set; }
-        public int Status { get; set; }
-        public int Quantity { get; set; }
-        public string Unit { get; set; }
 
-        public int CategoryId { get; set; }
-        public Category Category { get; set; }
-
-        public ICollection<SelectedProduct> SelectedProducts { get; set; }
+        public ICollection<Product> Products { get; set; }
     }
 }

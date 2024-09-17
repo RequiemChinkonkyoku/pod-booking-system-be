@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240917181152_AddCategory")]
+    partial class AddCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,21 +57,16 @@ namespace Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BookingPrice")
+                    b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("BookingStatusId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookingStatusId");
 
                     b.HasIndex("UserId");
 
@@ -92,31 +90,11 @@ namespace Repositories.Migrations
                     b.Property<int>("SlotId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SlotPrice")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
 
                     b.ToTable("BookingsDetails");
-                });
-
-            modelBuilder.Entity("Models.BookingStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BookingsStatuses");
                 });
 
             modelBuilder.Entity("Models.Category", b =>
@@ -470,19 +448,11 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("Models.Booking", b =>
                 {
-                    b.HasOne("Models.BookingStatus", "BookingStatus")
-                        .WithMany("Bookings")
-                        .HasForeignKey("BookingStatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Models.User", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("BookingStatus");
 
                     b.Navigation("User");
                 });
@@ -639,11 +609,6 @@ namespace Repositories.Migrations
                 {
                     b.Navigation("Slot")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Models.BookingStatus", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("Models.Category", b =>

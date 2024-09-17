@@ -49,6 +49,8 @@ namespace Repositories
         public virtual DbSet<Schedule> Schedules { get; set; }
         public virtual DbSet<BookingDetail> BookingsDetails { get; set; }
         public virtual DbSet<Method> Methods { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<BookingStatus> BookingsStatuses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -124,6 +126,16 @@ namespace Repositories
                 .HasOne(u => u.Booking)
                 .WithMany(r => r.Transactions)
                 .HasForeignKey(u => u.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Product>()
+                .HasOne(u => u.Category)
+                .WithMany(r => r.Products)
+                .HasForeignKey(u => u.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Booking>()
+                .HasOne(u => u.BookingStatus)
+                .WithMany(r => r.Bookings)
+                .HasForeignKey(u => u.BookingStatusId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
