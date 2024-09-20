@@ -7,7 +7,7 @@ using System.Transactions;
 
 namespace Repositories.Implement
 {
-    public class TransactionRepository : RepositoryBase<Transaction>
+    public class TransactionRepository : RepositoryBase<Models.Transaction>
     {
     }
 }

@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Models;
+using Repositories.Implement;
+using Repositories.Interface;
 using System.Security.Claims;
 using System.Text;
 
@@ -11,6 +14,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddScoped<IRepositoryBase<Area>, AreaRepository>();
+builder.Services.AddScoped<IRepositoryBase<BookingDetail>, BookingDetailRepository>();
+builder.Services.AddScoped<IRepositoryBase<Booking>, BookingRepository>();
+builder.Services.AddScoped<IRepositoryBase<BookingStatus>, BookingStatusRepository>();
+builder.Services.AddScoped<IRepositoryBase<Category>, CategoryRepository>();
+builder.Services.AddScoped<IRepositoryBase<Membership>, MembershipRepository>();
+builder.Services.AddScoped<IRepositoryBase<Pod>, PodRepository>();
+builder.Services.AddScoped<IRepositoryBase<PodType>, PodTypeRepository>();
+builder.Services.AddScoped<IRepositoryBase<Review>, ReviewRepository>();
+builder.Services.AddScoped<IRepositoryBase<Role>, RoleRepository>();
+builder.Services.AddScoped<IRepositoryBase<Schedule>, ScheduleRepository>();
+builder.Services.AddScoped<IRepositoryBase<SelectedProduct>, SelectedProductRepository>();
+builder.Services.AddScoped<IRepositoryBase<Product>, ProductRepository>();
+builder.Services.AddScoped<IRepositoryBase<Slot>, SlotRepository>();
+builder.Services.AddScoped<IRepositoryBase<Models.Transaction>, TransactionRepository>();
+builder.Services.AddScoped<IRepositoryBase<User>, UserRepository>();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Pod Booking System API", Version = "v1" });
