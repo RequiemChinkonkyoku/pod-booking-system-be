@@ -35,6 +35,21 @@ builder.Services.AddScoped<IRepositoryBase<Models.Transaction>, TransactionRepos
 builder.Services.AddScoped<IRepositoryBase<User>, UserRepository>();
 
 builder.Services.AddScoped<IAreaService, AreaService>();
+builder.Services.AddScoped<IBookingDetailService, BookingDetailService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IBookingStatusService, BookingStatusService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IMembershipService, MembershipService>();
+builder.Services.AddScoped<IPodService, PodService>();
+builder.Services.AddScoped<IPodTypeService, PodTypeService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
+builder.Services.AddScoped<ISelectedProductService, ISelectedProductService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ISlotService, SlotService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
