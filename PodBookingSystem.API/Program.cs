@@ -4,6 +4,8 @@ using Microsoft.OpenApi.Models;
 using Models;
 using Repositories.Implement;
 using Repositories.Interface;
+using Services.Implement;
+using Services.Interface;
 using System.Security.Claims;
 using System.Text;
 
@@ -31,6 +33,8 @@ builder.Services.AddScoped<IRepositoryBase<Product>, ProductRepository>();
 builder.Services.AddScoped<IRepositoryBase<Slot>, SlotRepository>();
 builder.Services.AddScoped<IRepositoryBase<Models.Transaction>, TransactionRepository>();
 builder.Services.AddScoped<IRepositoryBase<User>, UserRepository>();
+
+builder.Services.AddScoped<IAreaService, AreaService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
