@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Models;
+using Models.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +11,8 @@ namespace Services.Interface
     public interface IUserService
     {
         Task<string> Login(string email, string password);
+
+        Task<List<User>> GetUsersAsync();
+        Task<User> CreateUserAsync(CreateUserDto dto);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models;
+using Models.DTOs;
 using Repositories.Interface;
 using Services.Interface;
 using System;
@@ -34,6 +35,27 @@ namespace Services.Implement
                 }
             }
             return null;
+        }
+
+        public async Task<List<User>> GetUsersAsync()
+        {
+            return await _userRepo.GetAllAsync();
+        }
+
+        public async Task<User> CreateUserAsync(CreateUserDto dto)
+        {
+            var newUser = new User
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                Password = dto.Password,
+                Status = 0,
+                MembershipId = 1,
+                RoleId = 1,
+            };
+
+            await _userRepo.AddAsync(newUser);
+            return newUser;
         }
     }
 }
