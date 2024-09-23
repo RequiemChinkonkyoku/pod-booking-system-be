@@ -41,13 +41,30 @@ namespace PodBookingSystem.API.Controllers
         [HttpPost("add-product")]
         public async Task<IActionResult> AddProduct([FromBody] ProductDTO productDto)
         {
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var product = await _productService.AddProductAsync(productDto);
-            return Ok(product);
+            try
+            {
+                var product = await _productService.AddProductAsync(productDto);
+                return Ok(product);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Duplicate product name")
+                {
+                    return Conflict("Duplicate product name"); 
+                }
+                if (ex.Message == "Category does not exist")
+                {
+                    return NotFound("Category does not exist");
+                }
+                return StatusCode(500, "An error occurred while adding the product.");
+            }
+
         }
 
         [HttpPut("/update-product-by-id/productId/{id}")]
@@ -63,9 +80,21 @@ namespace PodBookingSystem.API.Controllers
                 var updatedProduct = await _productService.UpdateProductAsync(id, productDto);
                 return Ok(updatedProduct);
             }
-            catch (Exception ex) when (ex.Message == "Product not found")
+            catch (Exception ex)
             {
-                return NotFound();
+                if (ex.Message == "Duplicate product name")
+                {
+                    return Conflict(ex.Message); 
+                }
+                else if (ex.Message == "Category does not exist")
+                {
+                    return NotFound(ex.Message); 
+                }
+                else if (ex.Message == "Product not found")
+                {
+                    return NotFound(ex.Message); 
+                }
+                return StatusCode(500, "An error occurred while updating the product.");
             }
         }
 

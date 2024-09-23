@@ -7,15 +7,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Repositories.Implement;
 
 namespace Services.Implement
 {
     public class ProductService : IProductService
     {
         private readonly IRepositoryBase<Product> _productRepo;
-        public ProductService(IRepositoryBase<Product> productservice)
+        private readonly IRepositoryBase<Category> _categoryRepo;
+
+        public ProductService(IRepositoryBase<Product> productservice, IRepositoryBase<Category> categoryRepo)
         {
             _productRepo = productservice;
+            _categoryRepo = categoryRepo;
         }
 
         public async Task<List<Product>> GetAllProductsAsync()
@@ -44,6 +49,17 @@ namespace Services.Implement
 
         public async Task<Product> AddProductAsync(ProductDTO productDto)
         {
+            var allCategories = await _categoryRepo.GetAllAsync(); 
+            if (!allCategories.Any(c => c.Id == productDto.CategoryId))
+            {
+                throw new Exception("Category does not exist");
+            }
+            var allProducts = await _productRepo.GetAllAsync();
+
+            if (allProducts.Any(p => p.Name == productDto.Name))
+            {
+                throw new Exception("Duplicate product name");
+            }
             var product = new Product
             {
                 Name = productDto.Name,
@@ -61,6 +77,16 @@ namespace Services.Implement
 
         public async Task<Product> UpdateProductAsync(int id, ProductDTO productDto)
         {
+            var allCategories = await _categoryRepo.GetAllAsync();
+            if (!allCategories.Any(c => c.Id == productDto.CategoryId))
+            {
+                throw new Exception("Category does not exist");
+            }
+            var allProducts = await _productRepo.GetAllAsync();
+            if (allProducts.Any(p => p.Name == productDto.Name && p.Id != id))
+            {
+                throw new Exception("Duplicate product name");
+            }
             var product = await _productRepo.FindByIdAsync(id);
             if (product == null)
             {
@@ -92,6 +118,7 @@ namespace Services.Implement
             return product;
         }
 
+        
     }
 }
 
