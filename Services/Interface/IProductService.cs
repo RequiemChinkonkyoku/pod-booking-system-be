@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Services.Interface
 {
-    public interface IProductService
+    public interface IproductService
     {
         public Task<List<Product>> GetAllProductsAsync();
 
