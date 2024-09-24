@@ -51,5 +51,23 @@ namespace PodBookingSystem.API.Controllers
             }
             return Ok(user);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] UpdateUserDto request)
+        {
+            try
+            {
+                var response = await _userService.UpdateUserAsync(id, request);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. " + ex.Message);
+            }
+        }
     }
 }

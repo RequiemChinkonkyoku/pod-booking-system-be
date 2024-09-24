@@ -103,6 +103,36 @@ namespace Services.Implement
         {
             var user = await _userRepo.FindByIdAsync(id);
             return user;
-        } 
+        }
+
+        public async Task<User> UpdateUserAsync(int id, UpdateUserDto dto)
+        {
+            var existingUser = await GetUserByIdAsync(id);
+            if (existingUser == null)
+            {
+                throw new ArgumentException("User not found.");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                throw new ArgumentException("Name cannot be empty.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                if (!IsPasswordValid(dto.Password))
+                {
+                    throw new ArgumentException("Password must be at least 8 characters long, contain at least 1 capital letter, 1 normal letter, 1 special character, and 1 number.");
+                }
+
+                existingUser.Password = dto.Password;
+            }
+
+            existingUser.Name = dto.Name;
+
+            await _userRepo.UpdateAsync(existingUser);
+
+            return existingUser;
+        }
     }
 }

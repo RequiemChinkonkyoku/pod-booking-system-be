@@ -14,6 +14,7 @@ namespace Services.Interface
 
         Task<List<User>> GetUsersAsync();
         Task<User> CreateUserAsync(CreateUserDto dto);
+        Task<User> UpdateUserAsync(int id, UpdateUserDto dto);
         Task<User> GetUserByIdAsync(int id);
     }
 }
