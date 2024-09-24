@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
 using Repositories.Implement;
@@ -52,7 +53,7 @@ namespace PodBookingSystem.API.Controllers
             try
             {
                 var product = await _productService.AddProductAsync(productDto);
-                return Ok(product);
+                return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
             }
             catch (Exception ex)
             {

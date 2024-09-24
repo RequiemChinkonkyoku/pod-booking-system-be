@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
 using Services.Implement;
@@ -25,7 +26,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCategoryByID(int id)
+        public async Task<IActionResult> GetCategoryById(int id)
         {
             try
             {
@@ -48,7 +49,7 @@ namespace PodBookingSystem.API.Controllers
             try
             {
                 var category = await _categoryService.AddCategoryAsync(categoryDto);
-                return Ok(category);
+                return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
             }
             catch (Exception ex)
             {
