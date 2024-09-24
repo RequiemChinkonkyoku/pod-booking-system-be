@@ -17,9 +17,9 @@ namespace Services.Implement
         private readonly IRepositoryBase<Product> _productRepo;
         private readonly IRepositoryBase<Category> _categoryRepo;
 
-        public ProductService(IRepositoryBase<Product> productservice, IRepositoryBase<Category> categoryRepo)
+        public ProductService(IRepositoryBase<Product> productService, IRepositoryBase<Category> categoryRepo)
         {
-            _productRepo = productservice;
+            _productRepo = productService;
             _categoryRepo = categoryRepo;
         }
 
@@ -36,15 +36,6 @@ namespace Services.Implement
                 throw new Exception("Product not found");
             }
             return product;
-        }
-
-        public async Task AddProductAsync(Product product)
-        {
-            if (product == null)
-            {
-                throw new ArgumentNullException(nameof(product));
-            }
-            await _productRepo.AddAsync(product);
         }
 
         public async Task<Product> AddProductAsync(ProductDTO productDto)
@@ -117,8 +108,6 @@ namespace Services.Implement
             await _productRepo.UpdateAsync(product);
             return product;
         }
-
-        
     }
 }
 

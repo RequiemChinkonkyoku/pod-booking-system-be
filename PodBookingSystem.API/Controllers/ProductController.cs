@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
 using Repositories.Implement;
@@ -7,6 +8,8 @@ using Services.Interface;
 
 namespace PodBookingSystem.API.Controllers
 {
+    [ApiController]
+    [Route("/Products")]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -16,15 +19,15 @@ namespace PodBookingSystem.API.Controllers
             _productService = productService;
         }
 
-        [HttpGet("get-all-products")]
-        public async Task<ActionResult<List<Product>>> GetAllProduct()
+        [HttpGet]
+        public async Task<IActionResult> GetAllProduct()
         {
             var products = await _productService.GetAllProductsAsync();
             return Ok(products);
         }
 
-        [HttpGet("/get-product-by-id/productId/{id}")]
-        public async Task<ActionResult<Product>> GetProductById(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductById(int id)
         {
             try
             {
@@ -38,7 +41,7 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpPost("add-product")]
+        [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] ProductDTO productDto)
         {
 
@@ -50,7 +53,7 @@ namespace PodBookingSystem.API.Controllers
             try
             {
                 var product = await _productService.AddProductAsync(productDto);
-                return Ok(product);
+                return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
             }
             catch (Exception ex)
             {
@@ -67,7 +70,7 @@ namespace PodBookingSystem.API.Controllers
 
         }
 
-        [HttpPut("/update-product-by-id/productId/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDTO productDto)
         {
             if (!ModelState.IsValid)
@@ -98,7 +101,7 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpDelete("/delete-product-by-id/productId/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try

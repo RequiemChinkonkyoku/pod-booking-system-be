@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
 using Services.Implement;
@@ -6,6 +7,8 @@ using Services.Interface;
 
 namespace PodBookingSystem.API.Controllers
 {
+    [ApiController]
+    [Route("/Categories")]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -15,19 +18,19 @@ namespace PodBookingSystem.API.Controllers
             _categoryService = categoryService;
         }
 
-        [HttpGet("get-all-categories")]
-        public async Task<ActionResult<List<Category>>> GetAllCategory()
+        [HttpGet]
+        public async Task<IActionResult> GetAllCategory()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
             return Ok(categories);
         }
 
-        [HttpGet("/get-category-by-id/categoryid/{id}")]
-        public async Task<ActionResult<Category>> GetCategoryByID(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCategoryById(int id)
         {
             try
             {
-                var category = await _categoryService.GetCategoryByIDAsync(id);
+                var category = await _categoryService.GetCategoryByIdAsync(id);
                 return Ok(category);
             }
             catch (Exception ex) when (ex.Message == "Category not found")
@@ -36,8 +39,8 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpPost("add-category")]
-        public async Task<ActionResult<Category>> AddCategory([FromBody] CategoryDTO categoryDto)
+        [HttpPost]
+        public async Task<IActionResult> AddCategory([FromBody] CategoryDTO categoryDto)
         {
             if (!ModelState.IsValid)
             {
@@ -46,7 +49,7 @@ namespace PodBookingSystem.API.Controllers
             try
             {
                 var category = await _categoryService.AddCategoryAsync(categoryDto);
-                return Ok(category);
+                return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
             }
             catch (Exception ex)
             {
@@ -58,7 +61,7 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpPut("/update-category-by-id/categorytId/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categorydto)
         {
             if (!ModelState.IsValid)
@@ -85,7 +88,7 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpDelete("delete-category-by-id/categoryid/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             try
