@@ -6,7 +6,7 @@ using Services.Interface;
 namespace PodBookingSystem.API.Controllers
 {
     [ApiController]
-    [Route("/users")]
+    [Route("/Users")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
@@ -68,6 +68,12 @@ namespace PodBookingSystem.API.Controllers
             {
                 return StatusCode(500, "An unexpected error occurred. " + ex.Message);
             }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            return Ok();
         }
     }
 }
