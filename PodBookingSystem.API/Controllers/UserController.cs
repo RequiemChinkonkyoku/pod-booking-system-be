@@ -26,8 +26,30 @@ namespace PodBookingSystem.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreateUserDto request)
         {
-            var response = await _userService.CreateUserAsync(request);
-            return Ok(response);
+            try
+            {
+                var response = await _userService.CreateUserAsync(request);
+                return CreatedAtAction(nameof(GetUserById), new { id = response.Id }, response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. " + ex.Message);
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
         }
     }
 }
