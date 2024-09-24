@@ -134,5 +134,17 @@ namespace Services.Implement
 
             return existingUser;
         }
+
+        public async Task<bool> DeleteUserAsync(int userId)
+        {
+            var user = await GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found.");
+            }
+
+            await _userRepo.DeleteAsync(user);
+            return true;
+        }
     }
 }

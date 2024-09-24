@@ -73,7 +73,25 @@ namespace PodBookingSystem.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return Ok();
+            try
+            {
+                var success = await _userService.DeleteUserAsync(id);
+                if (success)
+                {
+                    return NoContent(); // 204 No Content
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message); // 404 Not Found
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred: " + ex.Message);
+            }
+
+            // Fallback
+            return StatusCode(500, "An unexpected error occurred.");
         }
     }
 }
