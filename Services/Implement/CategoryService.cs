@@ -25,7 +25,7 @@ namespace Services.Implement
             return await _categoryRepo.GetAllAsync();
         }
 
-        public async Task<Category> GetCategoryByIDAsync(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id)
         {
             var category = await _categoryRepo.FindByIdAsync(id);
             if(category == null)

@@ -12,12 +12,12 @@ using Repositories.Implement;
 
 namespace Services.Implement
 {
-    public class productService : IproductService
+    public class ProductService : IProductService
     {
         private readonly IRepositoryBase<Product> _productRepo;
         private readonly IRepositoryBase<Category> _categoryRepo;
 
-        public productService(IRepositoryBase<Product> productService, IRepositoryBase<Category> categoryRepo)
+        public ProductService(IRepositoryBase<Product> productService, IRepositoryBase<Category> categoryRepo)
         {
             _productRepo = productService;
             _categoryRepo = categoryRepo;

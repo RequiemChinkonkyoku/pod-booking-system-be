@@ -8,16 +8,12 @@ using System.Threading.Tasks;
 
 namespace Services.Interface
 {
-    public interface IproductService
+    public interface IProductService
     {
         public Task<List<Product>> GetAllProductsAsync();
-
         public Task<Product> GetProductByIdAsync(int id);
-
         public Task<Product> AddProductAsync(ProductDTO productDto);
-
         public Task<Product> UpdateProductAsync(int id, ProductDTO productDto);
-
         public Task<Product> DeleteProductAsync(int id);
     }
 }
