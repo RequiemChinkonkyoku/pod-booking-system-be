@@ -78,7 +78,7 @@ namespace Services.Implement
                 throw new Exception("Category Not Found");
 
             }
-             _categoryRepo.Delete(category);
+            await _categoryRepo.DeleteAsync(category);
         }
     }
 }

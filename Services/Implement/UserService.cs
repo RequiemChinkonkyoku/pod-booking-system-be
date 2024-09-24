@@ -143,7 +143,9 @@ namespace Services.Implement
                 throw new ArgumentException("User not found.");
             }
 
-            await _userRepo.DeleteAsync(user);
+            user.Status = -1;
+
+            await _userRepo.UpdateAsync(user);
             return true;
         }
     }
