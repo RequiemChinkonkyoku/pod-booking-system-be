@@ -52,19 +52,7 @@ namespace PodBookingSystem.API.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Duplicate Pod name")
-                {
-                    return Conflict("Duplicate Pod name");
-                }
-                if (ex.Message == "Area does not exist")
-                {
-                    return NotFound("Area does not exist");
-                }
-                if (ex.Message == "Pod Type does not exist")
-                {
-                    return Conflict("Pod Type does not exist");
-                }
-                return StatusCode(500, "An error occurred while adding the product.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
 
         }
@@ -83,23 +71,7 @@ namespace PodBookingSystem.API.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Pod not found")
-                {
-                    return NotFound("Pod not found");
-                }
-                if (ex.Message == "Area does not exist")
-                {
-                    return NotFound("Area does not exist");
-                }
-                if (ex.Message == "Pod Type does not exist")
-                {
-                    return Conflict("Pod Type does not exist");
-                }
-                if (ex.Message == "Duplicate Pod name")
-                {
-                    return Conflict("Duplicate Pod name");
-                }
-                return StatusCode(500, "An error occurred while updating the pod.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
