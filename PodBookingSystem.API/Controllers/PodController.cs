@@ -56,7 +56,7 @@ namespace PodBookingSystem.API.Controllers
             }
 
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePod(int id, [FromBody] PodDto podDto)
         {
             if (!ModelState.IsValid)

@@ -48,7 +48,7 @@ namespace PodBookingSystem.API.Controllers
             return Ok(area);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateArea(int id, [FromBody] AreaDto areaDto)
         {
             if (!ModelState.IsValid)
