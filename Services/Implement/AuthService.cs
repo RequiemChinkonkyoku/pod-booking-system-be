@@ -83,19 +83,16 @@ namespace Services.Implement
 
         public async Task<User> RegisterCustomer(CreateUserDto dto)
         {
+            // Validate Name
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
                 throw new ArgumentException("Name cannot be empty.");
             }
 
+            // Validate Email
             if (string.IsNullOrWhiteSpace(dto.Email))
             {
                 throw new ArgumentException("Email cannot be empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Password))
-            {
-                throw new ArgumentException("Password cannot be empty.");
             }
 
             if (!new EmailAddressAttribute().IsValid(dto.Email))
@@ -103,11 +100,10 @@ namespace Services.Implement
                 throw new ArgumentException("Invalid email format.");
             }
 
-            var users = await _userRepo.GetAllAsync();
-            var existingUser = users.FirstOrDefault(u => u.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase));
-            if (existingUser != null)
+            // Validate Password
+            if (string.IsNullOrWhiteSpace(dto.Password))
             {
-                throw new ArgumentException("Email is already in use.");
+                throw new ArgumentException("Password cannot be empty.");
             }
 
             if (!IsPasswordValid(dto.Password))
@@ -115,6 +111,21 @@ namespace Services.Implement
                 throw new ArgumentException("Password must be at least 8 characters long, contain at least 1 capital letter, 1 normal letter, 1 special character, and 1 number.");
             }
 
+            // Check if RoleId is within the valid range (1 to 4)
+            if (dto.RoleId < 1 || dto.RoleId > 4)
+            {
+                throw new ArgumentException("RoleId must be between 1 and 4.");
+            }
+
+            // Check if Email already exists
+            var users = await _userRepo.GetAllAsync();
+            var existingUser = users.FirstOrDefault(u => u.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase));
+            if (existingUser != null)
+            {
+                throw new ArgumentException("Email is already in use.");
+            }
+
+            // Hash the password before storing it
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
             var newUser = new User
@@ -125,12 +136,13 @@ namespace Services.Implement
                 PasswordHash = passwordHash,
                 Status = 0,
                 MembershipId = 1,
-                RoleId = 1,
+                RoleId = dto.RoleId,
             };
 
             await _userRepo.AddAsync(newUser);
             return newUser;
         }
+
 
         private bool IsPasswordValid(string password)
         {
