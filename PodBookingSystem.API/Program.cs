@@ -116,10 +116,14 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    //options.AddPolicy("CustomerAuth",
-    //    policy => policy.RequireClaim(ClaimTypes.Role, "Customer"));
-    //options.AddPolicy("DentistAuth",
-    //    policy => policy.RequireClaim(ClaimTypes.Role, "Dentist"));
+    options.AddPolicy("CustomerAuth",
+        policy => policy.RequireClaim(ClaimTypes.Role, "1"));
+    options.AddPolicy("StaffAuth",
+        policy => policy.RequireClaim(ClaimTypes.Role, "2"));
+    options.AddPolicy("ManagerAuth",
+        policy => policy.RequireClaim(ClaimTypes.Role, "3"));
+    options.AddPolicy("AdminAuth",
+        policy => policy.RequireClaim(ClaimTypes.Role, "4"));
 });
 
 builder.Services.AddDistributedMemoryCache();

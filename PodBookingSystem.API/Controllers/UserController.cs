@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
 using Services.Interface;
@@ -17,6 +18,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "3, 4")]
         public async Task<IActionResult> Get()
         {
             var response = await _userService.GetUsersAsync();
@@ -24,6 +26,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "3, 4")]
         public async Task<IActionResult> Post([FromBody] CreateUserDto request)
         {
             try
@@ -42,6 +45,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "3, 4")]
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -53,6 +57,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "3, 4")]
         public async Task<IActionResult> Put(int id, [FromBody] UpdateUserDto request)
         {
             try
@@ -71,6 +76,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "3, 4")]
         public async Task<IActionResult> Delete(int id)
         {
             try
