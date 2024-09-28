@@ -11,7 +11,6 @@ namespace Services.Interface
     public interface IUserService
     {
         Task<string> Login(string email, string password);
-
         Task<List<User>> GetUsersAsync();
         Task<User> CreateUserAsync(CreateUserDto dto);
         Task<User> UpdateUserAsync(int id, UpdateUserDto dto);

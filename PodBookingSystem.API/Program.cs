@@ -50,6 +50,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
