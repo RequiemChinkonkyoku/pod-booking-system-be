@@ -156,32 +156,43 @@ namespace Services.Implement
             return regex.IsMatch(password);
         }
 
-        private string SendEmailAsync(string _to, string _subject, string _body)
+        private string SendEmailAsync(string _to, string _subject, string name, string otpCode)
         {
             IConfiguration config = new ConfigurationBuilder()
-         .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", true, true)
-        .Build();
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", true, true)
+                .Build();
             var _email = config["GmailSender:Email"];
             var _password = config["GmailSender:Password"];
 
-            MailMessage message = new MailMessage(_email, _to, _subject, _body);
+            // Read the email template
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "email_template.html");
+            string emailBody = File.ReadAllText(templatePath);
 
-            message.BodyEncoding = System.Text.Encoding.UTF8;
-            message.SubjectEncoding = System.Text.Encoding.UTF8;
-            message.IsBodyHtml = true;
-            message.ReplyToList.Add(new MailAddress(_email));
-            message.Sender = new MailAddress(_email);
+            // Replace placeholders with actual values
+            emailBody = emailBody.Replace("{{Name}}", name)
+                                 .Replace("{{OTPCode}}", otpCode);
 
-            using var smtpClient = new SmtpClient("smtp.gmail.com");
-            smtpClient.Port = 587;
-            smtpClient.EnableSsl = true;
-            smtpClient.Credentials = new NetworkCredential(_email, _password);
+            MailMessage message = new MailMessage(_email, _to, _subject, emailBody)
+            {
+                BodyEncoding = System.Text.Encoding.UTF8,
+                SubjectEncoding = System.Text.Encoding.UTF8,
+                IsBodyHtml = true,
+                ReplyToList = { new MailAddress(_email) },
+                Sender = new MailAddress(_email)
+            };
+
+            using var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                EnableSsl = true,
+                Credentials = new NetworkCredential(_email, _password)
+            };
 
             try
             {
                 smtpClient.Send(message);
-                return "An verification email has been sent to your inbox.";
+                return "A verification email has been sent to your inbox.";
             }
             catch (Exception ex)
             {
@@ -189,6 +200,7 @@ namespace Services.Implement
                 return "Email cannot be sent.";
             }
         }
+
 
         private async Task<bool> SendOtpAsync(string email)
         {
@@ -224,7 +236,7 @@ namespace Services.Implement
 
             // Step 4: Generate a new OTP with 3 letters and 4 numbers.
             string newOtpCode = await GenerateCustomOtp();
-            var newExpirationTime = currentTime.AddMinutes(10); // Set expiration time for 10 minutes.
+            var newExpirationTime = currentTime.AddMinutes(15); // Set expiration time for 15 minutes.
 
             var newUserOtp = new UserOtp
             {
@@ -235,7 +247,7 @@ namespace Services.Implement
             await _userOtpRepo.AddAsync(newUserOtp);
 
             // Step 5: Send the OTP via email.
-            SendEmailAsync(user.Email, "OTP_noreply", newOtpCode);
+            SendEmailAsync(user.Email, "noreply", user.Name, newOtpCode);
 
             return true;
         }
