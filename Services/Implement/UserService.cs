@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using Models.DTOs;
@@ -106,6 +107,38 @@ namespace Services.Implement
             return newUser;
         }
 
+        public async Task<User> CreateStaffAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentNullException("email");
+            }
+
+            if (!new EmailAddressAttribute().IsValid(email))
+            {
+                throw new ArgumentException("Invalid email format.");
+            }
+            var users = await _userRepo.GetAllAsync();
+            var existingUser = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            if (existingUser != null)
+            {
+                throw new ArgumentException("Email is already in use.");
+            }
+
+            var newUser = new User
+            {
+                Name = "STAFF",
+                Email = email,
+                Password = "Password@123456",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password@123456"),
+                Status = 1,
+                MembershipId = 1,
+                RoleId = 2,
+            };
+
+            await _userRepo.AddAsync(newUser);
+            return newUser;
+        }
 
         private bool IsPasswordValid(string password)
         {

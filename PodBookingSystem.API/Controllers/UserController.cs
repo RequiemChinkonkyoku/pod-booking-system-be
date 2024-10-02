@@ -18,7 +18,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "3, 4")]
+        //[Authorize(Roles = "3, 4")]
         public async Task<IActionResult> Get()
         {
             var response = await _userService.GetUsersAsync();
@@ -26,7 +26,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "3, 4")]
+        //[Authorize(Roles = "3, 4")]
         public async Task<IActionResult> Post([FromBody] CreateUserDto request)
         {
             try
@@ -44,8 +44,27 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
+        [HttpPost("Email")]
+        //[Authorize(Roles = "3, 4")]
+        public async Task<IActionResult> PostCreateStaff(string email)
+        {
+            try
+            {
+                var response = await _userService.CreateStaffAsync(email);
+                return CreatedAtAction(nameof(GetUserById), new { id = response.Id }, response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. " + ex.Message);
+            }
+        }
+
         [HttpGet("{id}")]
-        [Authorize(Roles = "3, 4")]
+        //[Authorize(Roles = "3, 4")]
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -57,7 +76,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "3, 4")]
+        //[Authorize(Roles = "3, 4")]
         public async Task<IActionResult> Put(int id, [FromBody] UpdateUserDto request)
         {
             try
@@ -76,7 +95,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "3, 4")]
+        //[Authorize(Roles = "3, 4")]
         public async Task<IActionResult> Delete(int id)
         {
             try
