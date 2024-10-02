@@ -33,6 +33,7 @@ builder.Services.AddScoped<IRepositoryBase<Product>, ProductRepository>();
 builder.Services.AddScoped<IRepositoryBase<Slot>, SlotRepository>();
 builder.Services.AddScoped<IRepositoryBase<Models.Transaction>, TransactionRepository>();
 builder.Services.AddScoped<IRepositoryBase<User>, UserRepository>();
+builder.Services.AddScoped<IRepositoryBase<UserOtp>, UserOtpRepository>();
 
 builder.Services.AddScoped<IAreaService, AreaService>();
 builder.Services.AddScoped<IBookingDetailService, BookingDetailService>();

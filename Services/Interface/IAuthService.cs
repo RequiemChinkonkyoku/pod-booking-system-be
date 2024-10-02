@@ -11,6 +11,7 @@ namespace Services.Interface
     public interface IAuthService
     {
         Task<string> Login (string email, string password);
-        Task<User> RegisterCustomer(CreateUserDto dto); 
+        Task<User> RegisterCustomer(CreateUserDto dto);
+        Task<bool> VerifyOtpAsync(string email, string otpCode);
     }
 }

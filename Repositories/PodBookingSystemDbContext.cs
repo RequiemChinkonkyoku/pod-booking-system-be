@@ -51,6 +51,7 @@ namespace Repositories
         public virtual DbSet<Method> Methods { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<BookingStatus> BookingsStatuses { get; set; }
+        public virtual DbSet<UserOtp> UserOtps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -136,6 +137,11 @@ namespace Repositories
                 .HasOne(u => u.BookingStatus)
                 .WithMany(r => r.Bookings)
                 .HasForeignKey(u => u.BookingStatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserOtp>()
+                .HasOne(u => u.User)
+                .WithMany(r => r.UserOtps)
+                .HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             //SEEDING DATA - DO NOT CHANGE WITHOUT GROUP CONSENT

@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -19,12 +21,14 @@ namespace Services.Implement
     public class AuthService : IAuthService
     {
         private readonly IRepositoryBase<User> _userRepo;
+        private readonly IRepositoryBase<UserOtp> _userOtpRepo;
         private readonly IConfiguration _config;
 
-        public AuthService(IRepositoryBase<User> userRepo, IConfiguration config)
+        public AuthService(IRepositoryBase<User> userRepo, IConfiguration config, IRepositoryBase<UserOtp> userOtpRepo)
         {
             _userRepo = userRepo;
             _config = config;
+            _userOtpRepo = userOtpRepo;
         }
 
         public async Task<string> Login(string email, string password)
@@ -140,9 +144,10 @@ namespace Services.Implement
             };
 
             await _userRepo.AddAsync(newUser);
+            await SendOtpAsync(dto.Email);
+
             return newUser;
         }
-
 
         private bool IsPasswordValid(string password)
         {
@@ -150,5 +155,166 @@ namespace Services.Implement
             var regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$");
             return regex.IsMatch(password);
         }
+
+        private string SendEmailAsync(string _to, string _subject, string _body)
+        {
+            IConfiguration config = new ConfigurationBuilder()
+         .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", true, true)
+        .Build();
+            var _email = config["GmailSender:Email"];
+            var _password = config["GmailSender:Password"];
+
+            MailMessage message = new MailMessage(_email, _to, _subject, _body);
+
+            message.BodyEncoding = System.Text.Encoding.UTF8;
+            message.SubjectEncoding = System.Text.Encoding.UTF8;
+            message.IsBodyHtml = true;
+            message.ReplyToList.Add(new MailAddress(_email));
+            message.Sender = new MailAddress(_email);
+
+            using var smtpClient = new SmtpClient("smtp.gmail.com");
+            smtpClient.Port = 587;
+            smtpClient.EnableSsl = true;
+            smtpClient.Credentials = new NetworkCredential(_email, _password);
+
+            try
+            {
+                smtpClient.Send(message);
+                return "An verification email has been sent to your inbox.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return "Email cannot be sent.";
+            }
+        }
+
+        private async Task<bool> SendOtpAsync(string email)
+        {
+            // Step 1: Retrieve the user based on the provided email.
+            var users = await _userRepo.GetAllAsync();
+            var user = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+            if (user == null)
+            {
+                throw new ArgumentException("No user found with this email.");
+            }
+
+            // Step 2: Check if the user is already verified.
+            if (user.Status == 1)
+            {
+                throw new ArgumentException("User is already verified.");
+            }
+
+            // Step 3: Check if an existing OTP for the user is still valid.
+            var otpList = await _userOtpRepo.GetAllAsync();
+            var existingOtp = otpList.FirstOrDefault(o => o.UserId == user.Id);
+            var currentTime = DateTime.UtcNow;
+
+            if (existingOtp != null && existingOtp.ExpirationTime > currentTime)
+            {
+                // If the existing OTP is still valid, enforce a cooldown period before resending.
+                var cooldownPeriod = TimeSpan.FromMinutes(2);
+                if (existingOtp.ExpirationTime - currentTime < cooldownPeriod)
+                {
+                    throw new ArgumentException("OTP was recently generated. Please wait before requesting a new one.");
+                }
+            }
+
+            // Step 4: Generate a new OTP with 3 letters and 4 numbers.
+            string newOtpCode = await GenerateCustomOtp();
+            var newExpirationTime = currentTime.AddMinutes(10); // Set expiration time for 10 minutes.
+
+            var newUserOtp = new UserOtp
+            {
+                OtpCode = newOtpCode,
+                ExpirationTime = newExpirationTime,
+                UserId = user.Id
+            };
+            await _userOtpRepo.AddAsync(newUserOtp);
+
+            // Step 5: Send the OTP via email.
+            SendEmailAsync(user.Email, "OTP_noreply", newOtpCode);
+
+            return true;
+        }
+
+        private async Task<string> GenerateCustomOtp()
+        {
+            const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string numbers = "0123456789";
+            var random = new Random();
+
+            var letterPart = new string(Enumerable.Repeat(letters, 3)
+                                                  .Select(s => s[random.Next(s.Length)])
+                                                  .ToArray());
+
+            var numberPart = new string(Enumerable.Repeat(numbers, 4)
+                                                  .Select(s => s[random.Next(s.Length)])
+                                                  .ToArray());
+
+            string result = letterPart + numberPart;
+
+            var otpList = await _userOtpRepo.GetAllAsync();
+            var existingOtp = otpList.FirstOrDefault(o => o.OtpCode.Equals(result, StringComparison.OrdinalIgnoreCase));
+            if (existingOtp != null)
+            {
+                result = await GenerateCustomOtp();
+            }
+
+            return result;
+        }
+
+        public async Task<bool> VerifyOtpAsync(string email, string otpCode)
+        {
+            // Step 1: Retrieve the user by their email.
+            var users = await _userRepo.GetAllAsync();
+            var user = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+            if (user == null)
+            {
+                throw new ArgumentException("No user found with this email.");
+            }
+
+            // Step 2: Retrieve the OTP record for the user.
+            var otpList = await _userOtpRepo.GetAllAsync();
+            var existingOtp = otpList.FirstOrDefault(o => o.UserId == user.Id);
+
+            if (existingOtp == null)
+            {
+                throw new ArgumentException("No OTP record found for this user.");
+            }
+
+            // Step 3: Check if the provided OTP matches the stored OTP.
+            if (!existingOtp.OtpCode.Equals(otpCode, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Invalid OTP code.");
+            }
+
+            // Step 4: Check if the OTP has expired.
+            if (existingOtp.ExpirationTime < DateTime.UtcNow)
+            {
+                throw new ArgumentException("The OTP has expired. Please request a new OTP.");
+            }
+
+            // Step 5: Check if the OTP has already been used.
+            if (existingOtp.IsExpiredOrUsed)
+            {
+                throw new ArgumentException("This OTP code has already been used.");
+            }
+
+            // Step 6: Update user status to verified (Status = 1).
+            user.Status = 1;
+            await _userRepo.UpdateAsync(user);
+
+            // Step 7: Mark the OTP as used to prevent reuse.
+            existingOtp.IsExpiredOrUsed = true;
+            await _userOtpRepo.UpdateAsync(existingOtp);
+
+            // Step 8: Return true to indicate successful verification.
+            return true;
+        }
+
     }
 }
