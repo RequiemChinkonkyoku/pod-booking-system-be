@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Models;
-using Models.DTOs;
 using Repositories.Implement;
 using Repositories.Interface;
 using Services.Implement;
@@ -51,12 +50,6 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
-
-builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
-builder.Services.AddScoped<IMomoService, MomoService>();
-
-builder.Services.Configure<VnPayOptionModel>(builder.Configuration.GetSection("VnPay"));
-builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
