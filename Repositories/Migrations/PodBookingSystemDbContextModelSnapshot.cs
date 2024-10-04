@@ -52,7 +52,7 @@ namespace Repositories.Migrations
                             Description = "Beautiful location.",
                             Location = "Floor 1",
                             Name = "Area A"
-                });
+                        });
                 });
 
             modelBuilder.Entity("Models.Booking", b =>
@@ -99,7 +99,7 @@ namespace Repositories.Migrations
                             BookingStatusId = 5,
                             CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(888),
                             UserId = 2
-                });
+                        });
                 });
 
             modelBuilder.Entity("Models.BookingDetail", b =>
@@ -170,7 +170,7 @@ namespace Repositories.Migrations
                         {
                             Id = 5,
                             Name = "Completed"
-                });
+                        });
                 });
 
             modelBuilder.Entity("Models.Category", b =>
@@ -351,7 +351,7 @@ namespace Repositories.Migrations
                             Description = "Luxurious Pod.",
                             Name = "Premium Pod",
                             Price = 50000
-                        });
+                });
                 });
 
             modelBuilder.Entity("Models.Product", b =>
@@ -646,22 +646,6 @@ namespace Repositories.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "tnk",
-                            Name = "tnk",
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "Adam@gmail.com",
-                            Name = "Adam",
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("Models.Booking", b =>
