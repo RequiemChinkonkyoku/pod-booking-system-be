@@ -289,6 +289,20 @@ namespace Repositories
                     EndTime = TimeOnly.FromTimeSpan(new TimeSpan(11, 0, 0)),
                     Status = 1
                 });
+
+            //SEEDING DATA - DO NOT CHANGE WITHOUT GROUP CONSENT
+            //TABLE ROLE
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, Name = "Customer" },
+                new Role { Id = 2, Name = "Staff" },
+                new Role { Id = 3, Name = "Manager" },
+                new Role { Id = 4, Name = "Admin" }
+            );
+            //TABLE MEMBERSHIP
+            modelBuilder.Entity<Membership>().HasData(
+                new Membership { Id = 1, Name = "Regular", Description = "No bonuses", Status = 1 },
+                new Membership { Id = 2, Name = "VIP", Description = "VIPPRO", Status = 1 }
+            );
         }
     }
 }
