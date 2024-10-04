@@ -34,6 +34,7 @@ builder.Services.AddScoped<IRepositoryBase<Product>, ProductRepository>();
 builder.Services.AddScoped<IRepositoryBase<Slot>, SlotRepository>();
 builder.Services.AddScoped<IRepositoryBase<Models.Transaction>, TransactionRepository>();
 builder.Services.AddScoped<IRepositoryBase<User>, UserRepository>();
+builder.Services.AddScoped<IRepositoryBase<UserOtp>, UserOtpRepository>();
 
 builder.Services.AddScoped<IAreaService, AreaService>();
 builder.Services.AddScoped<IBookingDetailService, BookingDetailService>();
@@ -51,6 +52,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
@@ -122,10 +124,14 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    //options.AddPolicy("CustomerAuth",
-    //    policy => policy.RequireClaim(ClaimTypes.Role, "Customer"));
-    //options.AddPolicy("DentistAuth",
-    //    policy => policy.RequireClaim(ClaimTypes.Role, "Dentist"));
+    options.AddPolicy("CustomerAuth",
+        policy => policy.RequireClaim(ClaimTypes.Role, "1"));
+    options.AddPolicy("StaffAuth",
+        policy => policy.RequireClaim(ClaimTypes.Role, "2"));
+    options.AddPolicy("ManagerAuth",
+        policy => policy.RequireClaim(ClaimTypes.Role, "3"));
+    options.AddPolicy("AdminAuth",
+        policy => policy.RequireClaim(ClaimTypes.Role, "4"));
 });
 
 builder.Services.AddDistributedMemoryCache();

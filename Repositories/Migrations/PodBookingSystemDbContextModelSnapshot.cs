@@ -89,7 +89,7 @@ namespace Repositories.Migrations
                             Id = 1,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(873),
+                            CreatedTime = new DateTime(2024, 10, 4, 10, 32, 2, 501, DateTimeKind.Local).AddTicks(7539),
                             UserId = 1
                         },
                         new
@@ -97,7 +97,7 @@ namespace Repositories.Migrations
                             Id = 2,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(888),
+                            CreatedTime = new DateTime(2024, 10, 4, 10, 32, 2, 501, DateTimeKind.Local).AddTicks(7556),
                             UserId = 2
                         });
                 });
@@ -215,13 +215,20 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = 1,
+                            Description = "N/A",
+                            Name = "N/A",
+                            Status = 1
+                        },
+                        new
+                        {
+                            Id = 2,
                             Description = "No bonuses",
                             Name = "Regular",
                             Status = 1
                         },
                         new
                         {
-                            Id = 2,
+                            Id = 3,
                             Description = "VIPPRO",
                             Name = "VIP",
                             Status = 1
@@ -351,7 +358,7 @@ namespace Repositories.Migrations
                             Description = "Luxurious Pod.",
                             Name = "Premium Pod",
                             Price = 50000
-                });
+                        });
                 });
 
             modelBuilder.Entity("Models.Product", b =>
@@ -619,15 +626,20 @@ namespace Repositories.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int?>("MembershipId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
@@ -646,6 +658,80 @@ namespace Repositories.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "customer@gmail.com",
+                            MembershipId = 2,
+                            Name = "CUSTOMER",
+                            Password = "Customer@1234",
+                            PasswordHash = "$2a$11$tRkftQ7TT5bhiLClu0ec4OKGKFo9DTmcpMesOwAdXzJ/FBToa/Xke",
+                            RoleId = 1,
+                            Status = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Email = "staff@gmail.com",
+                            MembershipId = 1,
+                            Name = "STAFF",
+                            Password = "Staff@1234",
+                            PasswordHash = "$2a$11$JBZrRuBk.NQM6emYM0Sq7u0RIGpilM5/myCtz2ml7PehxfTuxLism",
+                            RoleId = 2,
+                            Status = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Email = "manager@gmail.com",
+                            MembershipId = 1,
+                            Name = "MANAGER",
+                            Password = "Manager@1234",
+                            PasswordHash = "$2a$11$ohha3md5iMoDc9U39xppgeY2elzdBPJfQERkY3kR4m/ihg2AcATxK",
+                            RoleId = 3,
+                            Status = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Email = "admin@gmail.com",
+                            MembershipId = 1,
+                            Name = "ADMIN",
+                            Password = "Admin@1234",
+                            PasswordHash = "$2a$11$eb1Sll6GCxze1EipuWt1C.nPYeaHoRDTzdUNeC.oJdgzU0Qi4BtWC",
+                            RoleId = 4,
+                            Status = 1
+                        });
+                });
+
+            modelBuilder.Entity("Models.UserOtp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpirationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsExpiredOrUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OtpCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserOtps");
                 });
 
             modelBuilder.Entity("Models.Booking", b =>
@@ -798,6 +884,17 @@ namespace Repositories.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("Models.UserOtp", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithMany("UserOtps")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Models.Area", b =>
                 {
                     b.Navigation("Pods");
@@ -869,6 +966,8 @@ namespace Repositories.Migrations
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("UserOtps");
                 });
 #pragma warning restore 612, 618
         }

@@ -41,5 +41,7 @@ namespace Models
         public Role Role { get; set; }
 
         public ICollection<Booking> Bookings { get; set; }
+
+        public ICollection<UserOtp> UserOtps { get; set; }
     }
 }

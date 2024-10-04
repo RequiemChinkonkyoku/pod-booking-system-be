@@ -51,6 +51,7 @@ namespace Repositories
         public virtual DbSet<Method> Methods { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<BookingStatus> BookingsStatuses { get; set; }
+        public virtual DbSet<UserOtp> UserOtps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -136,6 +137,11 @@ namespace Repositories
                 .HasOne(u => u.BookingStatus)
                 .WithMany(r => r.Bookings)
                 .HasForeignKey(u => u.BookingStatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserOtp>()
+                .HasOne(u => u.User)
+                .WithMany(r => r.UserOtps)
+                .HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BookingStatus>().HasData(
@@ -284,9 +290,56 @@ namespace Repositories
             );
             //TABLE MEMBERSHIP
             modelBuilder.Entity<Membership>().HasData(
-                new Membership { Id = 1, Name = "Regular", Description = "No bonuses", Status = 1 },
-                new Membership { Id = 2, Name = "VIP", Description = "VIPPRO", Status = 1 }
+                new Membership { Id = 1, Name = "N/A", Description = "N/A", Status = 1 },
+                new Membership { Id = 2, Name = "Regular", Description = "No bonuses", Status = 1 },
+                new Membership { Id = 3, Name = "VIP", Description = "VIPPRO", Status = 1 }
             );
+            //TABLE USER
+            modelBuilder.Entity<User>().HasData(
+        new User
+        {
+            Id = 1,
+            Name = "CUSTOMER",
+            Email = "customer@gmail.com",
+            Password = "Customer@1234",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@1234"),
+            Status = 1,
+            MembershipId = 2,
+            RoleId = 1
+        },
+        new User
+        {
+            Id = 2,
+            Name = "STAFF",
+            Email = "staff@gmail.com",
+            Password = "Staff@1234",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Staff@1234"),
+            Status = 1,
+            MembershipId = 1,
+            RoleId = 2
+        },
+        new User
+        {
+            Id = 3,
+            Name = "MANAGER",
+            Email = "manager@gmail.com",
+            Password = "Manager@1234",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Manager@1234"),
+            Status = 1,
+            MembershipId = 1,
+            RoleId = 3
+        },
+        new User
+        {
+            Id = 4,
+            Name = "ADMIN",
+            Email = "admin@gmail.com",
+            Password = "Admin@1234",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@1234"),
+            Status = 1,
+            MembershipId = 1,
+            RoleId = 4
+        });
         }
     }
 }
