@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240921084630_AddDataForPodAndSchedule")]
+    partial class AddDataForPodAndSchedule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,7 +92,7 @@ namespace Repositories.Migrations
                             Id = 1,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(873),
+                            CreatedTime = new DateTime(2024, 9, 21, 15, 46, 30, 589, DateTimeKind.Local).AddTicks(9993),
                             UserId = 1
                         },
                         new
@@ -97,7 +100,7 @@ namespace Repositories.Migrations
                             Id = 2,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(888),
+                            CreatedTime = new DateTime(2024, 9, 21, 15, 46, 30, 590, DateTimeKind.Local).AddTicks(5),
                             UserId = 2
                         });
                 });
@@ -278,7 +281,7 @@ namespace Repositories.Migrations
                             AreaId = 1,
                             Description = "Nice Pod",
                             Name = "Pod 2",
-                            PodTypeId = 2,
+                            PodTypeId = 1,
                             Status = 1
                         },
                         new
@@ -287,7 +290,7 @@ namespace Repositories.Migrations
                             AreaId = 1,
                             Description = "Premium Pod",
                             Name = "Pod 3",
-                            PodTypeId = 3,
+                            PodTypeId = 1,
                             Status = 1
                         });
                 });
@@ -334,7 +337,7 @@ namespace Repositories.Migrations
                             Id = 3,
                             Description = "Luxurious Pod.",
                             Name = "Premium Pod",
-                            Price = 50000
+                            Price = 10000
                         });
                 });
 

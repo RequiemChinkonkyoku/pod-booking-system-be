@@ -14,7 +14,8 @@ namespace Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int Status { get; set; }
-        
+        public DateOnly Date { get; set; }
+
         public int? ScheduleId { get; set; }
         public Schedule Schedule { get; set; }
 

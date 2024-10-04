@@ -25,6 +25,7 @@ namespace Services.Implement
         public async Task<string> Login(string email, string password)
         {
             var users = await _userRepo.GetAllAsync();
+
             if (!users.IsNullOrEmpty())
             {
                 var user = users.FirstOrDefault(x => x.Email.Equals(email));

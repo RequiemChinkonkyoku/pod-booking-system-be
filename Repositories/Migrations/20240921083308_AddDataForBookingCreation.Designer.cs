@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240921083308_AddDataForBookingCreation")]
+    partial class AddDataForBookingCreation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,7 +92,7 @@ namespace Repositories.Migrations
                             Id = 1,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(873),
+                            CreatedTime = new DateTime(2024, 9, 21, 15, 33, 8, 477, DateTimeKind.Local).AddTicks(3904),
                             UserId = 1
                         },
                         new
@@ -97,7 +100,7 @@ namespace Repositories.Migrations
                             Id = 2,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(888),
+                            CreatedTime = new DateTime(2024, 9, 21, 15, 33, 8, 477, DateTimeKind.Local).AddTicks(3915),
                             UserId = 2
                         });
                 });
@@ -271,24 +274,6 @@ namespace Repositories.Migrations
                             Name = "Pod 1",
                             PodTypeId = 1,
                             Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AreaId = 1,
-                            Description = "Nice Pod",
-                            Name = "Pod 2",
-                            PodTypeId = 2,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AreaId = 1,
-                            Description = "Premium Pod",
-                            Name = "Pod 3",
-                            PodTypeId = 3,
-                            Status = 1
                         });
                 });
 
@@ -321,20 +306,6 @@ namespace Repositories.Migrations
                             Description = "Pod for one.",
                             Name = "Single Pod",
                             Price = 10000
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "Pod for two.",
-                            Name = "Double Pod",
-                            Price = 20000
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Luxurious Pod.",
-                            Name = "Premium Pod",
-                            Price = 50000
                         });
                 });
 
@@ -450,27 +421,6 @@ namespace Repositories.Migrations
                             Id = 1,
                             EndTime = new TimeOnly(8, 0, 0),
                             StartTime = new TimeOnly(7, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EndTime = new TimeOnly(9, 0, 0),
-                            StartTime = new TimeOnly(8, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EndTime = new TimeOnly(10, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EndTime = new TimeOnly(11, 0, 0),
-                            StartTime = new TimeOnly(10, 0, 0),
                             Status = 1
                         });
                 });
