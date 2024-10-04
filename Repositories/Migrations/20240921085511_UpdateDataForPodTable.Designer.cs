@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240921085511_UpdateDataForPodTable")]
+    partial class UpdateDataForPodTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,22 +213,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Memberships");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "No bonuses",
-                            Name = "Regular",
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "VIPPRO",
-                            Name = "VIP",
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("Models.Method", b =>
@@ -437,28 +424,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Customer"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Staff"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Manager"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("Models.Schedule", b =>

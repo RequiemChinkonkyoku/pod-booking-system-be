@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240921084817_UpdateDataForPodTypesTable")]
+    partial class UpdateDataForPodTypesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,7 +92,7 @@ namespace Repositories.Migrations
                             Id = 1,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(873),
+                            CreatedTime = new DateTime(2024, 9, 21, 15, 48, 16, 839, DateTimeKind.Local).AddTicks(2495),
                             UserId = 1
                         },
                         new
@@ -97,7 +100,7 @@ namespace Repositories.Migrations
                             Id = 2,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(888),
+                            CreatedTime = new DateTime(2024, 9, 21, 15, 48, 16, 839, DateTimeKind.Local).AddTicks(2514),
                             UserId = 2
                         });
                 });
@@ -210,22 +213,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Memberships");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "No bonuses",
-                            Name = "Regular",
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "VIPPRO",
-                            Name = "VIP",
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("Models.Method", b =>
@@ -294,7 +281,7 @@ namespace Repositories.Migrations
                             AreaId = 1,
                             Description = "Nice Pod",
                             Name = "Pod 2",
-                            PodTypeId = 2,
+                            PodTypeId = 1,
                             Status = 1
                         },
                         new
@@ -303,7 +290,7 @@ namespace Repositories.Migrations
                             AreaId = 1,
                             Description = "Premium Pod",
                             Name = "Pod 3",
-                            PodTypeId = 3,
+                            PodTypeId = 1,
                             Status = 1
                         });
                 });
@@ -437,28 +424,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Customer"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Staff"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Manager"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("Models.Schedule", b =>
