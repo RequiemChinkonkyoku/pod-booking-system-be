@@ -138,6 +138,142 @@ namespace Repositories
                 .HasForeignKey(u => u.BookingStatusId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<BookingStatus>().HasData(
+                new BookingStatus
+                {
+                    Id = 1,
+                    Name = "Cancelled",
+                },
+                new BookingStatus
+                {
+                    Id = 2,
+                    Name = "Pending",
+                },
+                new BookingStatus
+                {
+                    Id = 3,
+                    Name = "Reserved",
+                },
+                new BookingStatus
+                {
+                    Id = 4,
+                    Name = "On-going",
+                },
+                new BookingStatus
+                {
+                    Id = 5,
+                    Name = "Completed",
+                });
+
+            modelBuilder.Entity<Booking>().HasData(
+                new Booking
+                {
+                    Id = 1,
+                    BookingPrice = 10000,
+                    CreatedTime = DateTime.Now,
+                    BookingStatusId = 5,
+                    UserId = 1,
+
+                },
+                new Booking
+                {
+                    Id = 2,
+                    BookingPrice = 10000,
+                    CreatedTime = DateTime.Now,
+                    BookingStatusId = 5,
+                    UserId = 2,
+
+                });
+
+            modelBuilder.Entity<Area>().HasData(
+                new Area
+                {
+                    Id = 1,
+                    Name = "Area A",
+                    Location = "Floor 1",
+                    Description = "Beautiful location."
+                });
+
+            modelBuilder.Entity<PodType>().HasData(
+                new PodType
+                {
+                    Id = 1,
+                    Name = "Single Pod",
+                    Description = "Pod for one.",
+                    Price = 10000
+                },
+                new PodType
+                {
+                    Id = 2,
+                    Name = "Double Pod",
+                    Description = "Pod for two.",
+                    Price = 20000
+                },
+                new PodType
+                {
+                    Id = 3,
+                    Name = "Premium Pod",
+                    Description = "Luxurious Pod.",
+                    Price = 50000
+                });
+
+            modelBuilder.Entity<Pod>().HasData(
+                new Pod
+                {
+                    Id = 1,
+                    Name = "Pod 1",
+                    Description = "Clean Pod",
+                    Status = 1,
+                    PodTypeId = 1,
+                    AreaId = 1
+                }, new Pod
+                {
+                    Id = 2,
+                    Name = "Pod 2",
+                    Description = "Nice Pod",
+                    Status = 1,
+                    PodTypeId = 2,
+                    AreaId = 1
+                }, new Pod
+                {
+                    Id = 3,
+                    Name = "Pod 3",
+                    Description = "Premium Pod",
+                    Status = 1,
+                    PodTypeId = 3,
+                    AreaId = 1
+                });
+
+            modelBuilder.Entity<Schedule>().HasData(
+                new Schedule
+                {
+                    Id = 1,
+                    StartTime = TimeOnly.FromTimeSpan(new TimeSpan(7, 0, 0)),
+                    EndTime = TimeOnly.FromTimeSpan(new TimeSpan(8, 0, 0)),
+                    Status = 1
+                },
+                new Schedule
+                {
+                    Id = 2,
+                    StartTime = TimeOnly.FromTimeSpan(new TimeSpan(8, 0, 0)),
+                    EndTime = TimeOnly.FromTimeSpan(new TimeSpan(9, 0, 0)),
+                    Status = 1
+                },
+                new Schedule
+                {
+                    Id = 3,
+                    StartTime = TimeOnly.FromTimeSpan(new TimeSpan(9, 0, 0)),
+                    EndTime = TimeOnly.FromTimeSpan(new TimeSpan(10, 0, 0)),
+                    Status = 1
+                },
+                new Schedule
+                {
+                    Id = 4,
+                    StartTime = TimeOnly.FromTimeSpan(new TimeSpan(10, 0, 0)),
+                    EndTime = TimeOnly.FromTimeSpan(new TimeSpan(11, 0, 0)),
+                    Status = 1
+                });
+
             //SEEDING DATA - DO NOT CHANGE WITHOUT GROUP CONSENT
             //TABLE ROLE
             modelBuilder.Entity<Role>().HasData(

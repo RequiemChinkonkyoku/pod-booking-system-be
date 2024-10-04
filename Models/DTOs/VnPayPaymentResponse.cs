@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Interface
+namespace Models.DTOs
 {
-    public interface ISelectedProductService
+    public class VnPayPaymentResponse
     {
     }
 }
