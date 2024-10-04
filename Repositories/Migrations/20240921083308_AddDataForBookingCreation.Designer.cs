@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240921083308_AddDataForBookingCreation")]
+    partial class AddDataForBookingCreation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,7 +92,7 @@ namespace Repositories.Migrations
                             Id = 1,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(873),
+                            CreatedTime = new DateTime(2024, 9, 21, 15, 33, 8, 477, DateTimeKind.Local).AddTicks(3904),
                             UserId = 1
                         },
                         new
@@ -97,7 +100,7 @@ namespace Repositories.Migrations
                             Id = 2,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(888),
+                            CreatedTime = new DateTime(2024, 9, 21, 15, 33, 8, 477, DateTimeKind.Local).AddTicks(3915),
                             UserId = 2
                         });
                 });
@@ -210,29 +213,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Memberships");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "N/A",
-                            Name = "N/A",
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "No bonuses",
-                            Name = "Regular",
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "VIPPRO",
-                            Name = "VIP",
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("Models.Method", b =>
@@ -294,24 +274,6 @@ namespace Repositories.Migrations
                             Name = "Pod 1",
                             PodTypeId = 1,
                             Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AreaId = 1,
-                            Description = "Nice Pod",
-                            Name = "Pod 2",
-                            PodTypeId = 2,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AreaId = 1,
-                            Description = "Premium Pod",
-                            Name = "Pod 3",
-                            PodTypeId = 3,
-                            Status = 1
                         });
                 });
 
@@ -344,21 +306,7 @@ namespace Repositories.Migrations
                             Description = "Pod for one.",
                             Name = "Single Pod",
                             Price = 10000
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "Pod for two.",
-                            Name = "Double Pod",
-                            Price = 20000
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Luxurious Pod.",
-                            Name = "Premium Pod",
-                            Price = 50000
-                });
+                        });
                 });
 
             modelBuilder.Entity("Models.Product", b =>
@@ -444,28 +392,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Customer"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Staff"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Manager"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("Models.Schedule", b =>
@@ -495,27 +421,6 @@ namespace Repositories.Migrations
                             Id = 1,
                             EndTime = new TimeOnly(8, 0, 0),
                             StartTime = new TimeOnly(7, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EndTime = new TimeOnly(9, 0, 0),
-                            StartTime = new TimeOnly(8, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EndTime = new TimeOnly(10, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EndTime = new TimeOnly(11, 0, 0),
-                            StartTime = new TimeOnly(10, 0, 0),
                             Status = 1
                         });
                 });
@@ -626,20 +531,15 @@ namespace Repositories.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("MembershipId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
@@ -663,75 +563,17 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = 1,
-                            Email = "customer@gmail.com",
-                            MembershipId = 2,
-                            Name = "CUSTOMER",
-                            Password = "Customer@1234",
-                            PasswordHash = "$2a$11$D/j3mUP8XnPBeXYX1srjt.GGQj9TkYoyaz2cVUJcZ3.OjVZOP22x2",
-                            RoleId = 1,
+                            Email = "tnk",
+                            Name = "tnk",
                             Status = 1
                         },
                         new
                         {
                             Id = 2,
-                            Email = "staff@gmail.com",
-                            MembershipId = 1,
-                            Name = "STAFF",
-                            Password = "Staff@1234",
-                            PasswordHash = "$2a$11$ofS3coZzZlgWmO.QMfnCNuYBbpZ47G8eGbX4naPfOi9VWpb3FySM2",
-                            RoleId = 2,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "manager@gmail.com",
-                            MembershipId = 1,
-                            Name = "MANAGER",
-                            Password = "Manager@1234",
-                            PasswordHash = "$2a$11$r5ayt5hom8OQUygD0XPhmeDyEtpRiKR/AhbIxYjwrx3LAmTRbwq8O",
-                            RoleId = 3,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Email = "admin@gmail.com",
-                            MembershipId = 1,
-                            Name = "ADMIN",
-                            Password = "Admin@1234",
-                            PasswordHash = "$2a$11$Z215tbwBLl8ojO6yR4ST6uoVD2Cfvgn6km/PXP36zBkcEBA.63aGe",
-                            RoleId = 4,
+                            Email = "Adam@gmail.com",
+                            Name = "Adam",
                             Status = 1
                         });
-                });
-
-            modelBuilder.Entity("Models.UserOtp", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ExpirationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsExpiredOrUsed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("OtpCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserOtps");
                 });
 
             modelBuilder.Entity("Models.Booking", b =>
@@ -884,17 +726,6 @@ namespace Repositories.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Models.UserOtp", b =>
-                {
-                    b.HasOne("Models.User", "User")
-                        .WithMany("UserOtps")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Models.Area", b =>
                 {
                     b.Navigation("Pods");
@@ -966,8 +797,6 @@ namespace Repositories.Migrations
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.Navigation("Bookings");
-
-                    b.Navigation("UserOtps");
                 });
 #pragma warning restore 612, 618
         }
