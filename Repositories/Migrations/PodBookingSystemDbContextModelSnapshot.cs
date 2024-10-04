@@ -44,15 +44,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Areas");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Beautiful location.",
-                            Location = "Floor 1",
-                            Name = "Area A"
-                        });
                 });
 
             modelBuilder.Entity("Models.Booking", b =>
@@ -82,24 +73,6 @@ namespace Repositories.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Bookings");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BookingPrice = 10000,
-                            BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(873),
-                            UserId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BookingPrice = 10000,
-                            BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(888),
-                            UserId = 2
-                        });
                 });
 
             modelBuilder.Entity("Models.BookingDetail", b =>
@@ -144,33 +117,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("BookingsStatuses");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Cancelled"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Pending"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Reserved"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "On-going"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Completed"
-                        });
                 });
 
             modelBuilder.Entity("Models.Category", b =>
@@ -277,35 +223,6 @@ namespace Repositories.Migrations
                     b.HasIndex("PodTypeId");
 
                     b.ToTable("Pods");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AreaId = 1,
-                            Description = "Clean Pod",
-                            Name = "Pod 1",
-                            PodTypeId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AreaId = 1,
-                            Description = "Nice Pod",
-                            Name = "Pod 2",
-                            PodTypeId = 2,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AreaId = 1,
-                            Description = "Premium Pod",
-                            Name = "Pod 3",
-                            PodTypeId = 3,
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("Models.PodType", b =>
@@ -329,29 +246,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PodTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Pod for one.",
-                            Name = "Single Pod",
-                            Price = 10000
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "Pod for two.",
-                            Name = "Double Pod",
-                            Price = 20000
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Luxurious Pod.",
-                            Name = "Premium Pod",
-                            Price = 50000
-                        });
                 });
 
             modelBuilder.Entity("Models.Product", b =>
@@ -481,36 +375,6 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Schedules");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EndTime = new TimeOnly(8, 0, 0),
-                            StartTime = new TimeOnly(7, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EndTime = new TimeOnly(9, 0, 0),
-                            StartTime = new TimeOnly(8, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EndTime = new TimeOnly(10, 0, 0),
-                            StartTime = new TimeOnly(9, 0, 0),
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EndTime = new TimeOnly(11, 0, 0),
-                            StartTime = new TimeOnly(10, 0, 0),
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("Models.SelectedProduct", b =>
@@ -552,9 +416,6 @@ namespace Repositories.Migrations
 
                     b.Property<int?>("BookingDetailId")
                         .HasColumnType("int");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
 
                     b.Property<int?>("PodId")
                         .HasColumnType("int");
@@ -646,22 +507,6 @@ namespace Repositories.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "tnk",
-                            Name = "tnk",
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "Adam@gmail.com",
-                            Name = "Adam",
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("Models.Booking", b =>
