@@ -89,7 +89,7 @@ namespace Repositories.Migrations
                             Id = 1,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(873),
+                            CreatedTime = new DateTime(2024, 10, 4, 10, 32, 2, 501, DateTimeKind.Local).AddTicks(7539),
                             UserId = 1
                         },
                         new
@@ -97,7 +97,7 @@ namespace Repositories.Migrations
                             Id = 2,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 9, 21, 15, 55, 11, 554, DateTimeKind.Local).AddTicks(888),
+                            CreatedTime = new DateTime(2024, 10, 4, 10, 32, 2, 501, DateTimeKind.Local).AddTicks(7556),
                             UserId = 2
                         });
                 });
@@ -358,7 +358,7 @@ namespace Repositories.Migrations
                             Description = "Luxurious Pod.",
                             Name = "Premium Pod",
                             Price = 50000
-                });
+                        });
                 });
 
             modelBuilder.Entity("Models.Product", b =>
@@ -667,7 +667,7 @@ namespace Repositories.Migrations
                             MembershipId = 2,
                             Name = "CUSTOMER",
                             Password = "Customer@1234",
-                            PasswordHash = "$2a$11$D/j3mUP8XnPBeXYX1srjt.GGQj9TkYoyaz2cVUJcZ3.OjVZOP22x2",
+                            PasswordHash = "$2a$11$tRkftQ7TT5bhiLClu0ec4OKGKFo9DTmcpMesOwAdXzJ/FBToa/Xke",
                             RoleId = 1,
                             Status = 1
                         },
@@ -678,7 +678,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "STAFF",
                             Password = "Staff@1234",
-                            PasswordHash = "$2a$11$ofS3coZzZlgWmO.QMfnCNuYBbpZ47G8eGbX4naPfOi9VWpb3FySM2",
+                            PasswordHash = "$2a$11$JBZrRuBk.NQM6emYM0Sq7u0RIGpilM5/myCtz2ml7PehxfTuxLism",
                             RoleId = 2,
                             Status = 1
                         },
@@ -689,7 +689,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "MANAGER",
                             Password = "Manager@1234",
-                            PasswordHash = "$2a$11$r5ayt5hom8OQUygD0XPhmeDyEtpRiKR/AhbIxYjwrx3LAmTRbwq8O",
+                            PasswordHash = "$2a$11$ohha3md5iMoDc9U39xppgeY2elzdBPJfQERkY3kR4m/ihg2AcATxK",
                             RoleId = 3,
                             Status = 1
                         },
@@ -700,7 +700,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "ADMIN",
                             Password = "Admin@1234",
-                            PasswordHash = "$2a$11$Z215tbwBLl8ojO6yR4ST6uoVD2Cfvgn6km/PXP36zBkcEBA.63aGe",
+                            PasswordHash = "$2a$11$eb1Sll6GCxze1EipuWt1C.nPYeaHoRDTzdUNeC.oJdgzU0Qi4BtWC",
                             RoleId = 4,
                             Status = 1
                         });
