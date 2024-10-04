@@ -138,22 +138,6 @@ namespace Repositories
                 .HasForeignKey(u => u.BookingStatusId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Name = "tnk",
-                    Email = "tnk",
-                    Status = 1
-                },
-                new User
-                {
-                    Id = 2,
-                    Name = "Adam",
-                    Email = "Adam@gmail.com",
-                    Status = 1
-                });
-
             modelBuilder.Entity<BookingStatus>().HasData(
                 new BookingStatus
                 {
