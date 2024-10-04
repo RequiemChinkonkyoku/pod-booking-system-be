@@ -15,5 +15,6 @@ namespace Services.Interface
         Task<List<Booking>> GetUserBookings(int id);
         Task<Booking> GetBookingById(int id);
         Task<CreateBookingResponse> UpdateBookingStatus(int id);
+        Task<UpdateBookingResponse> UpdateBooking(UpdateBookingRequest request);
     }
 }

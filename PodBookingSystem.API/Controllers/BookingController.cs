@@ -52,5 +52,19 @@ namespace PodBookingSystem.API.Controllers
                 return BadRequest(response.Message);
             }
         }
+
+        public async Task<IActionResult> UpdateBooking([FromBody] UpdateBookingRequest request)
+        {
+            var response = await _bookingService.UpdateBooking(request);
+
+            if (response.Success)
+            {
+                return Ok(response.Booking);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
+        }
     }
 }

@@ -227,5 +227,7 @@ namespace Services.Implement
 
             return new CreateBookingResponse { Success = true, Booking = booking };
         }
+
+
     }
 }
