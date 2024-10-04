@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Services.Implement
 {
-    public class SelectedProductService : ISelectedProductService
+    public class SelectedproductService : ISelectedproductService
     {
     }
 }

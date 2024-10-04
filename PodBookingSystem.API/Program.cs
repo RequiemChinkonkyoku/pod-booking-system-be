@@ -46,7 +46,7 @@ builder.Services.AddScoped<IPodTypeService, PodTypeService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
-builder.Services.AddScoped<ISelectedProductService, SelectedProductService>();
+builder.Services.AddScoped<ISelectedproductService, SelectedproductService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
