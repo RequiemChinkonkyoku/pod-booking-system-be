@@ -21,6 +21,7 @@ namespace Services.Implement
         public async Task<List<Area>> GetAllAreasAsync()
         {
             return await _areaRepo.GetAllAsync();
+
         }
 
         public async Task<Area> GetAreaByIDAsync(int id)
