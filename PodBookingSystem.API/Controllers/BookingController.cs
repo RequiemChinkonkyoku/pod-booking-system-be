@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 using Models.DTOs;
 using Services.Interface;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace PodBookingSystem.API.Controllers
@@ -17,7 +19,7 @@ namespace PodBookingSystem.API.Controllers
             _bookingService = bookingService;
         }
 
-        [HttpGet("view-user-booking")]
+        [HttpGet]
         public async Task<IActionResult> ViewUserBooking()
         {
             int userId = 0;
@@ -33,12 +35,33 @@ namespace PodBookingSystem.API.Controllers
 
             var response = await _bookingService.GetUserBookings(userId);
 
-            if (response.IsNullOrEmpty())
+            return Ok(response);
+        }
+
+        [HttpGet("/{id}")]
+        public async Task<IActionResult> ViewUserBookingById([FromRoute] int id)
+        {
+            int userId = 0;
+
+            try
             {
-                return BadRequest("There has been an error getting user bookings");
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name)?.Value.ToString());
+            }
+            catch (Exception)
+            {
+                return Unauthorized("You must login to perform this task.");
             }
 
-            return Ok(response);
+            var response = await _bookingService.GetBookingById(id, userId);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
         }
 
         [HttpPost("create-booking")]

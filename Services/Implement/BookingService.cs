@@ -41,13 +41,34 @@ namespace Services.Implement
             _userRepo = userRepo;
         }
 
-        public async Task<List<Booking>> GetUserBookings(int id)
+        public async Task<GetBookingResponse> GetUserBookings(int id)
         {
             var bookingList = await _bookingRepo.GetAllAsync();
 
             var userBookings = bookingList.Where(b => b.UserId == id).ToList();
 
-            return userBookings;
+            return new GetBookingResponse { Bookings = userBookings };
+        }
+
+        public async Task<GetBookingResponse> GetBookingById(int id, int userId)
+        {
+            var booking = await _bookingRepo.FindByIdAsync(id);
+
+            if (booking == null)
+            {
+                return new GetBookingResponse { Success = false, Message = "Unable to find booking with id " + id };
+            }
+
+            if (booking.UserId != userId)
+            {
+                return new GetBookingResponse { Success = false, Message = "The booking does not belong to this user" };
+            }
+
+            var user = await _userRepo.FindByIdAsync(userId);
+
+            booking.User = user;
+
+            return new GetBookingResponse { Success = true, Booking = booking };
         }
 
         public async Task<CancelBookingResponse> CancelBooking(int id, int userId)
@@ -187,22 +208,6 @@ namespace Services.Implement
             }
 
             return new CreateBookingResponse { Success = true, Booking = booking };
-        }
-
-        public async Task<Booking> GetBookingById(int id)
-        {
-            var booking = await _bookingRepo.FindByIdAsync(id);
-
-            if (booking == null)
-            {
-                return null;
-            }
-
-            var user = await _userRepo.FindByIdAsync(booking.UserId);
-
-            booking.User = user;
-
-            return booking;
         }
 
         public async Task<CreateBookingResponse> UpdateBookingStatus(int id)
