@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Models.DTOs;
 using Services.Interface;
+using System.Security.Claims;
 
 namespace PodBookingSystem.API.Controllers
 {
@@ -15,17 +17,70 @@ namespace PodBookingSystem.API.Controllers
             _bookingService = bookingService;
         }
 
-        [HttpGet("view-booking/{id}")]
-        public async Task<IActionResult> ViewBooking([FromRoute] int id)
+        [HttpGet("view-user-booking")]
+        public async Task<IActionResult> ViewUserBooking()
         {
-            var response = await _bookingService.GetUserBookings(id);
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _bookingService.GetUserBookings(userId);
+
+            if (response.IsNullOrEmpty())
+            {
+                return BadRequest("There has been an error getting user bookings");
+            }
 
             return Ok(response);
         }
 
-        [HttpPost("cancel-booking/{id}")]
-        public async Task<IActionResult> CancelBooking([FromRoute] int id, [FromBody] int userId)
+        [HttpPost("create-booking")]
+        public async Task<IActionResult> CreateBooking([FromBody] CreateBookingRequest request)
         {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _bookingService.CreateBooking(request, userId);
+
+            if (response.Success)
+            {
+                return Ok(response.Booking);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
+        }
+
+        [HttpPut("cancel-booking/{id}")]
+        public async Task<IActionResult> CancelBooking([FromRoute] int id)
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name)?.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
             var response = await _bookingService.CancelBooking(id, userId);
 
             if (response.Success)
@@ -38,10 +93,21 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpPut("create-booking")]
-        public async Task<IActionResult> CreateBooking([FromBody] CreateBookingRequest request)
+        [HttpPut("update-booking/{id}")]
+        public async Task<IActionResult> UpdateBooking([FromRoute] int id, [FromBody] UpdateBookingRequest request)
         {
-            var response = await _bookingService.CreateBooking(request);
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name)?.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _bookingService.UpdateBooking(id, request, userId);
 
             if (response.Success)
             {

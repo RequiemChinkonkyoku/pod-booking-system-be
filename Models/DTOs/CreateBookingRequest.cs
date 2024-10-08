@@ -8,8 +8,6 @@ namespace Models.DTOs
 {
     public class CreateBookingRequest
     {
-        public int UserId { get; set; }
-
         public DateOnly ArrivalDate { get; set; }
 
         public int PodId { get; set; }

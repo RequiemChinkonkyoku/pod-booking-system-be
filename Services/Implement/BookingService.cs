@@ -4,6 +4,7 @@ using Repositories.Interface;
 using Services.Interface;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -79,13 +80,12 @@ namespace Services.Implement
             return new CancelBookingResponse { Success = true, Booking = booking };
         }
 
-        public async Task<CreateBookingResponse> CreateBooking(CreateBookingRequest request)
+        public async Task<CreateBookingResponse> CreateBooking(CreateBookingRequest request, int userId)
         {
-            if (request.UserId <= 0 ||
-                request.ArrivalDate <= default(DateOnly) ||
+            if (userId <= 0 ||
+                request.ArrivalDate <= DateOnly.MinValue ||
                 request.PodId <= 0 ||
-                request.ScheduleIds == null ||
-                !request.ScheduleIds.Any())
+                request.ScheduleIds?.Any() != true)
             {
                 return new CreateBookingResponse { Success = false, Message = "All fields must be provided" };
             }
@@ -113,7 +113,7 @@ namespace Services.Implement
                     var bookedSlot = slots.FirstOrDefault(s => s.Date == request.ArrivalDate &&
                                                                s.PodId == request.PodId &&
                                                                s.ScheduleId == scheduleId &&
-                                                               s.Status == 0);
+                                                               s.Status == 1);
 
                     if (bookedSlot != null)
                     {
@@ -135,7 +135,7 @@ namespace Services.Implement
                 BookingPrice = podPrice,
                 CreatedTime = DateTime.UtcNow,
                 BookingStatusId = 2,
-                UserId = request.UserId
+                UserId = userId
             };
 
             try
@@ -222,10 +222,157 @@ namespace Services.Implement
             }
             catch (Exception ex)
             {
-                return new CreateBookingResponse { Success = false, Message = "There has been an error updating the appointment. " };
+                return new CreateBookingResponse { Success = false, Message = "There has been an error updating the appointment." };
             }
 
             return new CreateBookingResponse { Success = true, Booking = booking };
+        }
+
+        public async Task<UpdateBookingResponse> UpdateBooking(int bookingId, UpdateBookingRequest request, int userId)
+        {
+            if (userId <= 0 || bookingId <= 0)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "UserId and BookingId must be provided." };
+            }
+
+            if (request.NewPodId <= 0 &&
+                request.NewArrivalDate <= DateOnly.MinValue &&
+                request.NewScheduleIds?.Any() != true)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "Update data cannot be empty." };
+            }
+
+            var booking = await _bookingRepo.FindByIdAsync(bookingId);
+
+            if (booking == null)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "There is no booking with the id " + bookingId + "." };
+            }
+
+            if (booking.UserId != userId)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "The booking does not belong to this user." };
+            }
+
+            if (booking.BookingStatusId != 2 && booking.BookingStatusId != 3)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "Only Pending or Reserved bookings are able to be updated." };
+            }
+
+            var pod = await _podRepo.FindByIdAsync(request.NewPodId);
+
+            if (pod == null)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "There is no pod with the id " + request.NewPodId + "." };
+            }
+
+            foreach (var newScheduleId in request.NewScheduleIds)
+            {
+                var newSchedule = await _scheduleRepo.FindByIdAsync(newScheduleId);
+
+                if (newSchedule == null)
+                {
+                    return new UpdateBookingResponse { Success = false, Message = "Invalid ScheduleId: " + newScheduleId };
+                }
+
+                var slots = await _slotRepo.GetAllAsync();
+
+                if (slots.Any())
+                {
+                    var newBookedSlot = slots.FirstOrDefault(s => s.Date == request.NewArrivalDate &&
+                                                               s.PodId == request.NewPodId &&
+                                                               s.ScheduleId == newScheduleId &&
+                                                               s.Status == 1);
+
+                    if (newBookedSlot != null)
+                    {
+                        newBookedSlot.Schedule = await _scheduleRepo.FindByIdAsync(newBookedSlot.ScheduleId.Value);
+
+                        return new UpdateBookingResponse
+                        {
+                            Success = false,
+                            Message = "There is an existing booking between " + newBookedSlot.Schedule.StartTime + " and " + newBookedSlot.Schedule.EndTime
+                        };
+                    }
+                }
+            }
+            var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+
+            var oldDetails = bookingDetails.FindAll(bd => bd.BookingId == bookingId);
+
+            var oldSlots = new List<Slot>();
+
+            foreach (var detail in oldDetails)
+            {
+                var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                oldSlots.Add(slot);
+            }
+
+            try
+            {
+                foreach (var slot in oldSlots)
+                {
+                    await _slotRepo.DeleteAsync(slot);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "There has been an error removing old slots." };
+            }
+
+            try
+            {
+                foreach (var detail in oldDetails)
+                {
+                    await _bookingDetailRepo.DeleteAsync(detail);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "There has been an error removing old details." };
+            }
+
+            foreach (var newScheduleId in request.NewScheduleIds)
+            {
+                var slot = new Slot
+                {
+                    Status = 1,
+                    Date = request.NewArrivalDate,
+                    ScheduleId = newScheduleId,
+                    PodId = request.NewPodId
+                };
+
+                try
+                {
+                    await _slotRepo.AddAsync(slot);
+                }
+                catch (Exception ex)
+                {
+                    return new UpdateBookingResponse { Success = false, Message = "There has been an error updating Slot." };
+                }
+
+                var bookingDetail = new BookingDetail
+                {
+                    ArrivalDate = request.NewArrivalDate,
+                    BookingId = booking.Id,
+                    SlotId = slot.Id
+                };
+
+                try
+                {
+                    await _bookingDetailRepo.AddAsync(bookingDetail);
+
+                    slot.BookingDetailId = bookingDetail.Id;
+                    await _slotRepo.UpdateAsync(slot);
+                }
+                catch (Exception ex)
+                {
+                    return new UpdateBookingResponse { Success = false, Message = "There has been an error updating BookingDetail." };
+                }
+            }
+
+            return new UpdateBookingResponse { Success = true, Booking = booking };
         }
     }
 }
