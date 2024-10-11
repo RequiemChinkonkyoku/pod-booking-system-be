@@ -21,6 +21,7 @@ namespace Services.Implement
         private readonly IRepositoryBase<Schedule> _scheduleRepo;
         private readonly IRepositoryBase<Slot> _slotRepo;
         private readonly IRepositoryBase<User> _userRepo;
+        private readonly IRepositoryBase<Membership> _membershipRepo;
 
         public BookingService(IRepositoryBase<Booking> bookingRepo,
                               IRepositoryBase<BookingStatus> bookingStatusRepo,
@@ -29,7 +30,8 @@ namespace Services.Implement
                               IRepositoryBase<PodType> podTypeRepo,
                               IRepositoryBase<Schedule> scheduleRepo,
                               IRepositoryBase<Slot> slotRepo,
-                              IRepositoryBase<User> userRepo)
+                              IRepositoryBase<User> userRepo,
+                              IRepositoryBase<Membership> membershipRepo)
         {
             _bookingRepo = bookingRepo;
             _bookingStatusRepo = bookingStatusRepo;
@@ -39,6 +41,7 @@ namespace Services.Implement
             _scheduleRepo = scheduleRepo;
             _slotRepo = slotRepo;
             _userRepo = userRepo;
+            _membershipRepo = membershipRepo;
         }
 
         public async Task<GetBookingResponse> GetAllBookings()
@@ -116,6 +119,25 @@ namespace Services.Implement
                 request.ScheduleIds?.Any() != true)
             {
                 return new CreateBookingResponse { Success = false, Message = "All fields must be provided" };
+            }
+
+            var user = await _userRepo.FindByIdAsync(userId);
+
+            int dayDiff = request.ArrivalDate.DayNumber - DateOnly.FromDateTime(DateTime.UtcNow).Day;
+
+            if (user.MembershipId == 2 && dayDiff < 7)
+            {
+                return new CreateBookingResponse { Success = false, Message = "The arrival date must be at least 7 days from now." };
+            }
+
+            if (user.MembershipId == 3 && dayDiff < 3)
+            {
+                return new CreateBookingResponse { Success = false, Message = "The arrival date must be at least 3 days from now." };
+            }
+
+            if (dayDiff > 30)
+            {
+                return new CreateBookingResponse { Success = false, Message = "The arrival date must be within a month from now." };
             }
 
             var pod = await _podRepo.FindByIdAsync(request.PodId);
@@ -276,6 +298,25 @@ namespace Services.Implement
             if (pod == null)
             {
                 return new UpdateBookingResponse { Success = false, Message = "There is no pod with the id " + request.NewPodId + "." };
+            }
+
+            var user = await _userRepo.FindByIdAsync(userId);
+
+            int dayDiff = request.NewArrivalDate.DayNumber - DateOnly.FromDateTime(DateTime.UtcNow).Day;
+
+            if (user.MembershipId == 2 && dayDiff < 7)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "The arrival date must be at least 7 days from now." };
+            }
+
+            if (user.MembershipId == 3 && dayDiff < 3)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "The arrival date must be at least 3 days from now." };
+            }
+
+            if (dayDiff > 30)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "The arrival date must be within a month from now." };
             }
 
             foreach (var newScheduleId in request.NewScheduleIds)
