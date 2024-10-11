@@ -41,6 +41,13 @@ namespace Services.Implement
             _userRepo = userRepo;
         }
 
+        public async Task<GetBookingResponse> GetAllBookings()
+        {
+            var bookingList = await _bookingRepo.GetAllAsync();
+
+            return new GetBookingResponse { Bookings = bookingList };
+        }
+
         public async Task<GetBookingResponse> GetUserBookings(int id)
         {
             var bookingList = await _bookingRepo.GetAllAsync();

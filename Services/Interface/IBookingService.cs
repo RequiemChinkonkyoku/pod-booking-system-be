@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
+using Models;
 using Models.DTOs;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Services.Interface
 {
     public interface IBookingService
     {
+        Task<GetBookingResponse> GetAllBookings();
         Task<GetBookingResponse> GetUserBookings(int id);
         Task<GetBookingResponse> GetBookingById(int id, int userId);
         Task<CancelBookingResponse> CancelBooking(int id, int userId);
