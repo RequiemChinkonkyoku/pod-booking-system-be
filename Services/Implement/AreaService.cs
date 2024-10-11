@@ -13,14 +13,33 @@ namespace Services.Implement
     public class AreaService : IAreaService
     {
         private readonly IRepositoryBase<Area> _areaRepo;
-        public AreaService(IRepositoryBase<Area> areaRepo)
+        private readonly IRepositoryBase<Pod> _podRepo;
+        public AreaService(IRepositoryBase<Area> areaRepo, IRepositoryBase<Pod> podRepo)
         {
             _areaRepo = areaRepo;
+            _podRepo = podRepo;
         }
 
         public async Task<List<Area>> GetAllAreasAsync()
         {
-            return await _areaRepo.GetAllAsync();
+            var areas = await _areaRepo.GetAllAsync();
+
+            var allPods = await _podRepo.GetAllAsync();
+
+            AssignPodsToAreas(areas, allPods);
+
+            areas = areas.Where(area => area.Pods != null && area.Pods.Any()).ToList();
+
+            return areas;
+
+        }
+
+        private void AssignPodsToAreas(List<Area> areas, List<Pod> pods)
+        {
+            foreach (var area in areas)
+            {
+                area.Pods = pods.Where(p => p.AreaId == area.Id).ToList();
+            }
         }
 
         public async Task<Area> GetAreaByIDAsync(int id)
@@ -40,9 +59,9 @@ namespace Services.Implement
                 Name = areaDto.Name,
                 Description = areaDto.Description,
                 Location = areaDto.Location
-            };
 
-            await _areaRepo.AddAsync(area); 
+            };
+            await _areaRepo.AddAsync(area);
             return area;
         }
 

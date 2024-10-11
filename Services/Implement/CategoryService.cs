@@ -15,16 +15,28 @@ namespace Services.Implement
     public class CategoryService : ICategoryService
     {
         private readonly IRepositoryBase<Category> _categoryRepo;
-        public CategoryService(IRepositoryBase<Category> categoryRepo)
+        private readonly IRepositoryBase<Product> _productRepo;
+        public CategoryService(IRepositoryBase<Category> categoryRepo, IRepositoryBase<Product> productRepo)
         {
             _categoryRepo = categoryRepo;
+            _productRepo = productRepo;
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
-            return await _categoryRepo.GetAllAsync();
+            var categories = await _categoryRepo.GetAllAsync();
+            var allProducts = await _productRepo.GetAllAsync();
+            AssignProductToCategory(allProducts, categories);
+            categories = categories.Where(category => category.Products != null && category.Products.Any()).ToList();
+            return categories;
         }
-
+        private void AssignProductToCategory(List<Product> products, List<Category> category)
+        {
+            foreach (var categories in category)
+            {
+                categories.Products = products.Where(p => p.CategoryId == categories.Id).ToList();
+            }
+        }
         public async Task<Category> GetCategoryByIdAsync(int id)
         {
             var category = await _categoryRepo.FindByIdAsync(id);
