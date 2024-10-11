@@ -56,7 +56,7 @@ namespace Services.Implement
                 Name = productDto.Name,
                 Price = productDto.Price,
                 Description = productDto.Description,
-                Status = productDto.Status,
+                Status = 1,
                 Quantity = productDto.Quantity,
                 Unit = productDto.Unit,
                 CategoryId = productDto.CategoryId

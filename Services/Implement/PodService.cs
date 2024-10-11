@@ -63,7 +63,7 @@ namespace Services.Implement
             {
                 Name = podDto.Name,
                 Description = podDto.Description,
-                Status = podDto.Status,
+                Status = 1,
                 AreaId = podDto.AreaId,
                 PodTypeId = podDto.PodTypeId,
             };

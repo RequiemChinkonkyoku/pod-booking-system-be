@@ -13,14 +13,28 @@ namespace Services.Implement
     public class PodTypeService : IPodTypeService
     {
         private readonly IRepositoryBase<PodType> _podTypeRepo;
-        public PodTypeService(IRepositoryBase<PodType> podTypeRepo)
+        private readonly IRepositoryBase<Pod> _podRepo;
+        public PodTypeService(IRepositoryBase<PodType> podTypeRepo, IRepositoryBase<Pod> podRepo)
         {
             _podTypeRepo = podTypeRepo;
+            _podRepo = podRepo;
         }
 
         public async Task<List<PodType>> GetAllPodTypesAsync()
         {
-            return await _podTypeRepo.GetAllAsync();
+            var podTypes = await _podTypeRepo.GetAllAsync();
+            var allPod = await _podRepo.GetAllAsync();
+            AssignPodTypeToPod(podTypes, allPod);
+            podTypes = podTypes.Where(podTypes => podTypes.Pods != null && podTypes.Pods.Any()).ToList();
+            return podTypes;
+        }
+
+        private void AssignPodTypeToPod(List<PodType> podTypes, List<Pod> pods)
+        {
+            foreach (var podType in podTypes)
+            {
+                podType.Pods = pods.Where(p => p.PodTypeId == podType.Id).ToList();
+            }
         }
 
         public async Task<PodType> GetPodTypeByIDAsync(int id)
