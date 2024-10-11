@@ -386,5 +386,33 @@ namespace Services.Implement
 
             return new UpdateBookingResponse { Success = true, Booking = booking };
         }
+
+        public async Task<FinishBookingResponse> FinishBooking(int id)
+        {
+            var booking = await _bookingRepo.FindByIdAsync(id);
+
+            if (booking == null)
+            {
+                return new FinishBookingResponse { Success = false, Message = "There are no booking with id " + id };
+            }
+
+            if (booking.BookingStatusId != 4)
+            {
+                return new FinishBookingResponse { Success = false, Message = "Only On-going bookings can be finished." };
+            }
+
+            booking.BookingStatusId = 5;
+
+            try
+            {
+                await _bookingRepo.UpdateAsync(booking);
+            }
+            catch (Exception ex)
+            {
+                return new FinishBookingResponse { Success = false, Message = "There has been an error updating the booking." };
+            }
+
+            return new FinishBookingResponse { Success = true, Booking = booking };
+        }
     }
 }

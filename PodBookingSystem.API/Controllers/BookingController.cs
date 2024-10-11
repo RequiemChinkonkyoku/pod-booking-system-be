@@ -161,5 +161,31 @@ namespace PodBookingSystem.API.Controllers
                 return BadRequest(response.Message);
             }
         }
+
+        [HttpPut("finish-booking/{id}")]
+        public async Task<IActionResult> FinishBooking([FromRoute] int id)
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name)?.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _bookingService.FinishBooking(id);
+
+            if (response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+            else
+            {
+                return Ok(response);
+            }
+        }
     }
 }
