@@ -10,10 +10,11 @@ namespace Services.Interface
 {
     public interface IBookingService
     {
+        Task<GetBookingResponse> GetUserBookings(int id);
+        Task<GetBookingResponse> GetBookingById(int id, int userId);
         Task<CancelBookingResponse> CancelBooking(int id, int userId);
-        Task<CreateBookingResponse> CreateBooking(CreateBookingRequest request);
-        Task<List<Booking>> GetUserBookings(int id);
-        Task<Booking> GetBookingById(int id);
+        Task<CreateBookingResponse> CreateBooking(CreateBookingRequest request, int userId);
         Task<CreateBookingResponse> UpdateBookingStatus(int id);
+        Task<UpdateBookingResponse> UpdateBooking(int bookingId, UpdateBookingRequest request, int userId);
     }
 }
