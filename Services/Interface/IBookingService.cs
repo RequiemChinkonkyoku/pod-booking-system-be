@@ -13,7 +13,8 @@ namespace Services.Interface
     {
         Task<GetBookingResponse> GetAllBookings();
         Task<GetBookingResponse> GetUserBookings(int id);
-        Task<GetBookingResponse> GetBookingById(int id, int userId);
+        Task<GetBookingResponse> GetBookingById(int id);
+        Task<GetBookingResponse> GetUserBookingById(int id, int userId);
         Task<CancelBookingResponse> CancelBooking(int id, int userId);
         Task<CreateBookingResponse> CreateBooking(CreateBookingRequest request, int userId);
         Task<CreateBookingResponse> UpdateBookingStatus(int id);

@@ -60,7 +60,23 @@ namespace Services.Implement
             return new GetBookingResponse { Bookings = userBookings };
         }
 
-        public async Task<GetBookingResponse> GetBookingById(int id, int userId)
+        public async Task<GetBookingResponse> GetBookingById(int id)
+        {
+            var booking = await _bookingRepo.FindByIdAsync(id);
+
+            if (booking == null)
+            {
+                return new GetBookingResponse { Success = false, Message = "Unable to find booking with id " + id };
+            }
+
+            var user = await _userRepo.FindByIdAsync(booking.UserId);
+
+            booking.User = user;
+
+            return new GetBookingResponse { Success = true, Booking = booking };
+        }
+
+        public async Task<GetBookingResponse> GetUserBookingById(int id, int userId)
         {
             var booking = await _bookingRepo.FindByIdAsync(id);
 

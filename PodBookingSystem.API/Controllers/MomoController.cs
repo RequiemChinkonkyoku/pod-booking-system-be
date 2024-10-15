@@ -24,21 +24,15 @@ namespace PodBookingSystem.API.Controllers
         [HttpPost("create-payment")]
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
         {
-            var booking = await _bookingService.GetBookingById(request.BookingId);
+            var getResponse = await _bookingService.GetBookingById(request.BookingId);
 
-            if (booking == null)
+            if (getResponse.Success == false)
             {
-                return BadRequest("The booking with the id " + request.BookingId + " does not exist.");
+                return BadRequest(getResponse.Message);
             }
 
-            // TO-DO: Validate if booking belongs to user
-            //if (booking.UserId != userId)
-            //{
-            //    return BadRequest("The booking does not belong to this customer.");
-            //}
-
-            request.FullName = booking.User.Name;
-            request.Amount = booking.BookingPrice;
+            request.FullName = getResponse.Booking.User.Name;
+            request.Amount = getResponse.Booking.BookingPrice;
 
             var response = await _momoService.CreatePaymentAsync(request);
 

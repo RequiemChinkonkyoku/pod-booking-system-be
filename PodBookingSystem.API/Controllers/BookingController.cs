@@ -72,7 +72,7 @@ namespace PodBookingSystem.API.Controllers
                 return Unauthorized("You must login to perform this task.");
             }
 
-            var response = await _bookingService.GetBookingById(id, userId);
+            var response = await _bookingService.GetUserBookingById(id, userId);
 
             if (response.Success)
             {
