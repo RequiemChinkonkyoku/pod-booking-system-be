@@ -13,7 +13,5 @@ namespace Models.DTOs
         public string Message { get; set; }
 
         public MomoPaymentResponse MomoPaymentResponse { get; set; }
-
-        public VnPayPaymentResponse VnPayPaymentResponse { get; set; }
     }
 }

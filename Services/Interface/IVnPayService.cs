@@ -10,6 +10,8 @@ namespace Services.Interface
 {
     public interface IVnPayService
     {
-        public string CreatePaymentUrl(CreatePaymentRequest request, HttpContext context);
+        public string CreatePaymentUrl(VnpayInfoModel request, HttpContext context);
+
+        public Task<VnpayResponseModel> PaymentExecute(IQueryCollection collections);
     }
 }

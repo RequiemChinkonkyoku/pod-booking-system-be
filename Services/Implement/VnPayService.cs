@@ -11,132 +11,135 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Globalization;
+using Microsoft.Extensions.Configuration;
+using Repositories.Interface;
+using Models;
 
 namespace Services.Implement
 {
     public class VnPayService : IVnPayService
     {
-        private readonly IOptions<VnPayOptionModel> _options;
-        private readonly HttpClient _client;
-        private readonly SortedList<string, string> _requestData = new SortedList<string, string>(new VnPayCompare());
+        private readonly IConfiguration _configuration;
+        private readonly IRepositoryBase<Booking> _bookingRepo;
+        private readonly IRepositoryBase<Transaction> _transactionRepo;
 
-        public VnPayService(IOptions<VnPayOptionModel> options)
+        public VnPayService(IConfiguration configuration, IRepositoryBase<Booking> bookingRepo, IRepositoryBase<Transaction> transactionRepo)
         {
-            _options = options;
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri(_options.Value.BaseUrl);
+            _configuration = configuration;
+            _bookingRepo = bookingRepo;
+            _transactionRepo = transactionRepo;
         }
-
-        public string CreatePaymentUrl(CreatePaymentRequest request, HttpContext context)
+        public string CreatePaymentUrl(VnpayInfoModel model, HttpContext context)
         {
-            var timeZoneId = TimeZoneInfo.FindSystemTimeZoneById(_options.Value.TimeZoneId);
-            var timeNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.UtcNow, timeZoneId);
+            var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(_configuration["Vnpay:TimeZoneId"]);
+            var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
             var tick = DateTime.Now.Ticks.ToString();
-            var urlCallback = _options.Value.ReturnUrl;
+            var pay = new VnPayLibrary();
+            var urlCallBack = _configuration["Vnpay:ReturnUrl"];
 
-            var requestData = new
-            {
-                vnp_Version = _options.Value.Version,
-                vnp_Command = _options.Value.Command,
-                vnp_TmnCode = _options.Value.TmnCode,
-                vnp_Amount = request.Amount,
-                vnp_CreateDate = timeNow.ToString("yyyyMMddHHmmss"),
-                vnp_CurrCode = _options.Value.CurrCode,
-                vnp_IpAddr = GetIpAddress(context),
-                vnp_Locale = _options.Value.Locale,
-                vnp_OrderInfo = request.OrderInfo,
-                vnp_OrderType = "Payment",
-                vnp_ReturnUrl = _options.Value.ReturnUrl,
-                vnp_TxnRef = tick
-            };
+            pay.AddRequestData("vnp_Version", _configuration["Vnpay:Version"]);
+            pay.AddRequestData("vnp_Command", _configuration["Vnpay:Command"]);
+            pay.AddRequestData("vnp_TmnCode", _configuration["Vnpay:TmnCode"]);
+            pay.AddRequestData("vnp_Amount", ((int)model.Amount * 100).ToString());
+            pay.AddRequestData("vnp_CreateDate", timeNow.ToString("yyyyMMddHHmmss"));
+            pay.AddRequestData("vnp_CurrCode", _configuration["Vnpay:CurrCode"]);
+            pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
+            pay.AddRequestData("vnp_Locale", _configuration["Vnpay:Locale"]);
+            pay.AddRequestData("vnp_OrderInfo", $"Name: {model.Name}, Amount: {model.Amount}, BookingId: {model.BookingId} ");
+            pay.AddRequestData("vnp_OrderType", model.OrderType);
+            pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
+            pay.AddRequestData("vnp_TxnRef", tick);
 
-            var paymentUrl = CreateRequestUrl(_options.Value.BaseUrl, _options.Value.HashSecret);
+            var paymentUrl =
+                pay.CreateRequestUrl(_configuration["Vnpay:BaseUrl"], _configuration["Vnpay:HashSecret"]);
 
             return paymentUrl;
         }
 
-        private string GetIpAddress(HttpContext context)
+        public async Task<VnpayResponseModel> PaymentExecute(IQueryCollection collections)
         {
-            var ipAddress = string.Empty;
+            var pay = new VnPayLibrary();
+
+            var response = pay.GetFullResponseData(collections, _configuration["Vnpay:HashSecret"]);
+
+            if (!response.Success)
+            {
+                response.Message = $"Payment unsuccessful. Response code: {response.VnPayResponseCode}";
+
+                return response;
+            }
+
+            if (response.VnPayResponseCode.Equals("24"))
+            {
+                response.Message = $"Payment cancelled. Response code: {response.VnPayResponseCode}";
+
+                return response;
+            }
+
+            var orderDescriptionParts = response.OrderDescription.Split(", ");
+
+            var bookingId = "";
+
+            var amount = "";
+
+            foreach (var part in orderDescriptionParts)
+            {
+                if (part.StartsWith("BookingId:"))
+                {
+                    bookingId = part.Replace("BookingId: ", "").Trim();
+                }
+
+                if (part.StartsWith("Amount:"))
+                {
+                    amount = part.Replace("Amount: ", "").Trim();
+                }
+            }
+
+            var booking = await _bookingRepo.FindByIdAsync(Int32.Parse(bookingId));
+
+            if (booking.BookingStatusId != 2 && booking.BookingStatusId != 3)
+            {
+                response.Message = "Payment can only be done for Pending or Reserved bookings.";
+
+                return response;
+            }
+
+            booking.BookingStatusId = 4;
+
             try
             {
-                var remoteIpAddress = context.Connection.RemoteIpAddress;
-
-                if (remoteIpAddress != null)
-                {
-                    if (remoteIpAddress.AddressFamily == AddressFamily.InterNetworkV6)
-                    {
-                        remoteIpAddress = Dns.GetHostEntry(remoteIpAddress).AddressList
-                            .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
-                    }
-
-                    if (remoteIpAddress != null) ipAddress = remoteIpAddress.ToString();
-
-                    return ipAddress;
-                }
+                await _bookingRepo.UpdateAsync(booking);
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                response.Message = $"There has been an error updating booking status {ex.Message}";
+
+                return response;
             }
 
-            return "127.0.0.1";
-        }
-
-        public string CreateRequestUrl(string baseUrl, string vnpHashSecret)
-        {
-            var data = new StringBuilder();
-
-            foreach (var (key, value) in _requestData.Where(kv => !string.IsNullOrEmpty(kv.Value)))
+            var transaction = new Transaction
             {
-                data.Append(WebUtility.UrlEncode(key) + "=" + WebUtility.UrlEncode(value) + "&");
-            }
+                //TransactionId = response.TransactionId,
+                //OrderId = response.OrderId,
+                PaymentTime = DateTime.UtcNow,
+                TotalPrice = Int32.Parse(amount),
+                Status = response.Success ? 1 : 0,
+                MethodId = 2,
+                BookingId = Int32.Parse(bookingId)
+            };
 
-            var querystring = data.ToString();
-
-            baseUrl += "?" + querystring;
-
-            var signData = querystring;
-
-            if (signData.Length > 0)
+            try
             {
-                signData = signData.Remove(data.Length - 1, 1);
+                await _transactionRepo.AddAsync(transaction);
             }
-
-            var vnpSecureHash = HmacSha512(vnpHashSecret, signData);
-
-            baseUrl += "vnp_SecureHash=" + vnpSecureHash;
-
-            return baseUrl;
-        }
-
-        private string HmacSha512(string key, string inputData)
-        {
-            var hash = new StringBuilder();
-            var keyBytes = Encoding.UTF8.GetBytes(key);
-            var inputBytes = Encoding.UTF8.GetBytes(inputData);
-            using (var hmac = new HMACSHA512(keyBytes))
+            catch (Exception ex)
             {
-                var hashValue = hmac.ComputeHash(inputBytes);
-                foreach (var theByte in hashValue)
-                {
-                    hash.Append(theByte.ToString("x2"));
-                }
+                response.Message = $"There has been an error adding transaction. {ex.Message}";
+
+                return response;
             }
 
-            return hash.ToString();
+            return response;
         }
-    }
-}
-
-public class VnPayCompare : IComparer<string>
-{
-    public int Compare(string x, string y)
-    {
-        if (x == y) return 0;
-        if (x == null) return -1;
-        if (y == null) return 1;
-        var vnpCompare = CompareInfo.GetCompareInfo("en-US");
-        return vnpCompare.Compare(x, y, CompareOptions.Ordinal);
     }
 }

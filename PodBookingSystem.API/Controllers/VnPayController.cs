@@ -5,6 +5,7 @@ using Services.Interface;
 
 namespace PodBookingSystem.API.Controllers
 {
+    [Route("[controller]")]
     public class VnPayController : Controller
     {
         private readonly IVnPayService _vnpService;
@@ -20,7 +21,8 @@ namespace PodBookingSystem.API.Controllers
             _transactionService = transactionService;
         }
 
-        public IActionResult CreatePayment([FromBody] CreatePaymentRequest request)
+        [HttpPost]
+        public IActionResult CreatePaymentUrl([FromBody] VnpayInfoModel request)
         {
             var url = _vnpService.CreatePaymentUrl(request, HttpContext);
 
@@ -32,5 +34,19 @@ namespace PodBookingSystem.API.Controllers
             return Ok(url);
         }
 
+        [HttpGet("payment-callback")]
+        public async Task<IActionResult> PaymentCallBack()
+        {
+            var response = await _vnpService.PaymentExecute(Request.Query);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response);
+            }
+        }
     }
 }
