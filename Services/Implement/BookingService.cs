@@ -139,7 +139,7 @@ namespace Services.Implement
 
             var user = await _userRepo.FindByIdAsync(userId);
 
-            int dayDiff = request.ArrivalDate.DayNumber - DateOnly.FromDateTime(DateTime.UtcNow).Day;
+            int dayDiff = ((request.ArrivalDate).ToDateTime(TimeOnly.MinValue) - DateTime.UtcNow).Days;
 
             if (user.MembershipId == 2 && dayDiff < 7)
             {
@@ -176,7 +176,7 @@ namespace Services.Implement
 
                 if (slots.Any())
                 {
-                    var bookedSlot = slots.FirstOrDefault(s => s.Date == request.ArrivalDate &&
+                    var bookedSlot = slots.FirstOrDefault(s => s.ArrivalDate == request.ArrivalDate &&
                                                                s.PodId == request.PodId &&
                                                                s.ScheduleId == scheduleId &&
                                                                s.Status == 1);
@@ -218,7 +218,7 @@ namespace Services.Implement
                 var slot = new Slot
                 {
                     Status = 1,
-                    Date = request.ArrivalDate,
+                    ArrivalDate = request.ArrivalDate,
                     ScheduleId = scheduleId,
                     PodId = request.PodId
                 };
@@ -234,7 +234,6 @@ namespace Services.Implement
 
                 var bookingDetail = new BookingDetail
                 {
-                    ArrivalDate = request.ArrivalDate,
                     BookingId = booking.Id,
                     SlotId = slot.Id
                 };
@@ -318,7 +317,7 @@ namespace Services.Implement
 
             var user = await _userRepo.FindByIdAsync(userId);
 
-            int dayDiff = request.NewArrivalDate.DayNumber - DateOnly.FromDateTime(DateTime.UtcNow).Day;
+            int dayDiff = ((request.NewArrivalDate).ToDateTime(TimeOnly.MinValue) - DateTime.UtcNow).Days;
 
             if (user.MembershipId == 2 && dayDiff < 7)
             {
@@ -348,7 +347,7 @@ namespace Services.Implement
 
                 if (slots.Any())
                 {
-                    var newBookedSlot = slots.FirstOrDefault(s => s.Date == request.NewArrivalDate &&
+                    var newBookedSlot = slots.FirstOrDefault(s => s.ArrivalDate == request.NewArrivalDate &&
                                                                s.PodId == request.NewPodId &&
                                                                s.ScheduleId == newScheduleId &&
                                                                s.Status == 1);
@@ -407,7 +406,7 @@ namespace Services.Implement
                 var slot = new Slot
                 {
                     Status = 1,
-                    Date = request.NewArrivalDate,
+                    ArrivalDate = request.NewArrivalDate,
                     ScheduleId = newScheduleId,
                     PodId = request.NewPodId
                 };
@@ -423,7 +422,6 @@ namespace Services.Implement
 
                 var bookingDetail = new BookingDetail
                 {
-                    ArrivalDate = request.NewArrivalDate,
                     BookingId = booking.Id,
                     SlotId = slot.Id
                 };

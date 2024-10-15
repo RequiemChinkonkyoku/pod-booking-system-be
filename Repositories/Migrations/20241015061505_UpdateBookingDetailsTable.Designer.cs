@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241015061505_UpdateBookingDetailsTable")]
+    partial class UpdateBookingDetailsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,7 +92,7 @@ namespace Repositories.Migrations
                             Id = 1,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 10, 15, 13, 18, 28, 496, DateTimeKind.Local).AddTicks(9718),
+                            CreatedTime = new DateTime(2024, 10, 15, 13, 15, 4, 723, DateTimeKind.Local).AddTicks(9263),
                             UserId = 1
                         },
                         new
@@ -97,7 +100,7 @@ namespace Repositories.Migrations
                             Id = 2,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 10, 15, 13, 18, 28, 496, DateTimeKind.Local).AddTicks(9730),
+                            CreatedTime = new DateTime(2024, 10, 15, 13, 15, 4, 723, DateTimeKind.Local).AddTicks(9276),
                             UserId = 2
                         });
                 });
@@ -114,6 +117,9 @@ namespace Repositories.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("SlotId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SlotPrice")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -669,7 +675,7 @@ namespace Repositories.Migrations
                             MembershipId = 2,
                             Name = "CUSTOMER",
                             Password = "Customer@1234",
-                            PasswordHash = "$2a$11$Na3EtpBysuWSvrNy4j38xuzTvAjOFJBgRBlgSVfuz/foweXqpz7.W",
+                            PasswordHash = "$2a$11$pU3bl65ouhwL3L/7wW47PuWwsP7i30QAK8eNPkIshLeDzCqXlP8hi",
                             RoleId = 1,
                             Status = 1
                         },
@@ -680,7 +686,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "STAFF",
                             Password = "Staff@1234",
-                            PasswordHash = "$2a$11$PtQzsaDn324o9LjfO.37rec5eqbzqKOKDMdZ9/Bvoa0RSb/j2lWYi",
+                            PasswordHash = "$2a$11$iazPSLENzo6Ydwv44TMm9e5QyZms9l1XdN0SGu7M5s56CxsZLL7a6",
                             RoleId = 2,
                             Status = 1
                         },
@@ -691,7 +697,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "MANAGER",
                             Password = "Manager@1234",
-                            PasswordHash = "$2a$11$1yTypC/ZXkkU4azv2MpvYO5/NtutLPBGQNmh6WI99sr8OJF4SO232",
+                            PasswordHash = "$2a$11$2DeSBOnupbwvPnozwGOzUOSLV3/DvE5AukzJXKithBA98M8SvLh4y",
                             RoleId = 3,
                             Status = 1
                         },
@@ -702,7 +708,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "ADMIN",
                             Password = "Admin@1234",
-                            PasswordHash = "$2a$11$Ni58tMDLDzwx3riC6LBdtOD/st0TneJP29/bi22CLvUwJ5balcyDu",
+                            PasswordHash = "$2a$11$3BKHBFZF6kVwOMzaUkbJjeCkTRgKLLJQysorzrVHLHj/.PlmpP44K",
                             RoleId = 4,
                             Status = 1
                         });
