@@ -180,11 +180,11 @@ namespace PodBookingSystem.API.Controllers
 
             if (response.Success)
             {
-                return BadRequest(response.Message);
+                return Ok(response);
             }
             else
             {
-                return Ok(response);
+                return BadRequest(response.Message);
             }
         }
     }
