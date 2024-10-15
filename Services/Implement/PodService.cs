@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Microsoft.VisualBasic;
+using Models;
 using Models.DTOs;
 using Repositories;
 using Repositories.Interface;
@@ -16,18 +17,22 @@ namespace Services.Implement
         private readonly IRepositoryBase<Pod> _podRepo;
         private readonly IRepositoryBase<Area> _areaRepo;
         private readonly IRepositoryBase<PodType> _podTypeRepo;
-        public PodService(IRepositoryBase<Pod> podRepo , IRepositoryBase<Area> areaRepo, IRepositoryBase<PodType> podTypeRepo)
+        private readonly IRepositoryBase<Slot> _slotRepo;
+        private readonly IRepositoryBase<Schedule> _scheduleRepo;
+        public PodService(IRepositoryBase<Pod> podRepo , IRepositoryBase<Area> areaRepo, IRepositoryBase<PodType> podTypeRepo, IRepositoryBase<Slot> slotRepo, IRepositoryBase<Schedule> scheduleRepo)
         {
             _podRepo = podRepo;
             _areaRepo = areaRepo;
             _podTypeRepo = podTypeRepo;
-
+            _slotRepo = slotRepo;
+            _scheduleRepo = scheduleRepo;
         }
 
         public async Task<List<Pod>> GetAllPodsAsync()
         {
             return await _podRepo.GetAllAsync();
         }
+
 
         public async Task<Pod> GetPodByIDAsync(int id)
         {
