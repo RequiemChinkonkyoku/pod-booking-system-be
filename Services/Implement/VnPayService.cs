@@ -119,8 +119,8 @@ namespace Services.Implement
 
             var transaction = new Transaction
             {
-                //TransactionId = response.TransactionId,
-                //OrderId = response.OrderId,
+                OrderId = response.OrderId,
+                PaymentId = response.PaymentId,
                 PaymentTime = DateTime.UtcNow,
                 TotalPrice = Int32.Parse(amount),
                 Status = response.Success ? 1 : 0,
