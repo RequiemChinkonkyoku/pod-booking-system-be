@@ -105,6 +105,43 @@ namespace Services.Implement
             return new MembershipSignUpResponse { Success = true, Membership = membership };
         }
 
+        public async Task<ChangemembershipResponse> ChangeMembership(int id, int userId)
+        {
+            var result = true;
+
+            var user = await _userRepo.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new ChangemembershipResponse { Success = false, Message = $"Cant find user with id {id}" };
+            }
+
+            if (user.MembershipId == 1)
+            {
+                return new ChangemembershipResponse { Success = false, Message = $"The user membership cannot be changed." };
+            }
+
+            var membership = await _memberRepo.FindByIdAsync(id);
+
+            if (membership == null)
+            {
+                return new ChangemembershipResponse { Success = false, Message = $"Cant find membership with id {id}" };
+            }
+
+            user.MembershipId = id;
+
+            try
+            {
+                await _userRepo.UpdateAsync(user);
+            }
+            catch (Exception ex)
+            {
+                return new ChangemembershipResponse { Success = false, Message = $"There has been an error updating the user membership." };
+            }
+
+            return new ChangemembershipResponse { Success = true };
+        }
+
         public async Task<bool> CancelMembership(int userId)
         {
             var result = true;
@@ -118,7 +155,7 @@ namespace Services.Implement
 
             if (user.MembershipId == 1)
             {
-                return false;
+                result = false;
             }
 
             user.MembershipId = 2;

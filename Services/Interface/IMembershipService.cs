@@ -14,6 +14,7 @@ namespace Services.Interface
         public Task<GetMembershipResponse> GetMembershipById(int id);
         public Task<CreateMembershipResponse> CreateMembership(CreateMembershipRequest request);
         public Task<MembershipSignUpResponse> SignUp(int id, int userId);
+        public Task<ChangemembershipResponse> ChangeMembership(int id, int userId);
         public Task<bool> CancelMembership(int userId);
     }
 }

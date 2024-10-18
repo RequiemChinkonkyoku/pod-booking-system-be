@@ -28,7 +28,7 @@ namespace PodBookingSystem.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetMembershipById([FromRoute] int id)
         {
             int userId = 0;
@@ -90,6 +90,25 @@ namespace PodBookingSystem.API.Controllers
             {
                 return BadRequest(response.Message);
             }
+        }
+
+        [HttpPost("change-membership")]
+        public async Task<IActionResult> ChangeMembership([FromRoute] int id)
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _memberService.ChangeMembership(id, userId);
+
+            return Ok();
         }
 
         [HttpPost("cancel-membership")]
