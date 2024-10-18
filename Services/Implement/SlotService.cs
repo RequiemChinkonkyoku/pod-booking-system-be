@@ -1,4 +1,5 @@
 ﻿using Models;
+using Models.DTOs;
 using Repositories.Interface;
 using Services.Interface;
 using System;
@@ -39,7 +40,7 @@ namespace Services.Implement
             return filteredSlots;
         }
 
-        public async Task<List<Slot>> GetFullyBookedSlotByPodTypeAsync(int podTypeId)
+        public async Task<List<FullyBookedSlotDto>> GetFullyBookedSlotByPodTypeAsync(int podTypeId)
         {
             var allPods = await _podRepo.GetAllAsync();
             var relevantPodIds = allPods
@@ -47,14 +48,20 @@ namespace Services.Implement
                 .Select(p => p.Id)
                 .ToList();
 
+            
             var allSlots = await _slotRepo.GetAllAsync();
 
             var fullyBookedSlots = allSlots
                 .Where(s => s.PodId.HasValue && relevantPodIds.Contains(s.PodId.Value))
-                .GroupBy(s => s.ScheduleId)
+                .GroupBy(s => new { s.ScheduleId, s.ArrivalDate }) 
                 .Where(g => g.Select(slot => slot.PodId).Distinct().Count() == relevantPodIds.Count)
-                .SelectMany(g => g)
+                .Select(g => new FullyBookedSlotDto
+                {
+                    ScheduleId = g.Key.ScheduleId,
+                    ArrivalDate = g.Key.ArrivalDate 
+                })
                 .ToList();
+
 
             return fullyBookedSlots;
 
