@@ -17,10 +17,30 @@ namespace PodBookingSystem.API.Controllers
         public BookingController(IBookingService bookingService)
         {
             _bookingService = bookingService;
+
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewUserBooking()
+        public async Task<IActionResult> GetAllBookings()
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _bookingService.GetAllBookings();
+
+            return Ok(response);
+        }
+
+        [HttpGet("customer")]
+        public async Task<IActionResult> GetCustomerBooking()
         {
             int userId = 0;
 
@@ -38,7 +58,7 @@ namespace PodBookingSystem.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/{id}")]
+        [HttpGet("customer/{id}")]
         public async Task<IActionResult> ViewUserBookingById([FromRoute] int id)
         {
             int userId = 0;
@@ -52,7 +72,7 @@ namespace PodBookingSystem.API.Controllers
                 return Unauthorized("You must login to perform this task.");
             }
 
-            var response = await _bookingService.GetBookingById(id, userId);
+            var response = await _bookingService.GetUserBookingById(id, userId);
 
             if (response.Success)
             {
@@ -135,6 +155,32 @@ namespace PodBookingSystem.API.Controllers
             if (response.Success)
             {
                 return Ok(response.Booking);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
+        }
+
+        [HttpPut("finish-booking/{id}")]
+        public async Task<IActionResult> FinishBooking([FromRoute] int id)
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name)?.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _bookingService.FinishBooking(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
             }
             else
             {

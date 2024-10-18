@@ -21,6 +21,7 @@ namespace Services.Implement
         private readonly IRepositoryBase<Schedule> _scheduleRepo;
         private readonly IRepositoryBase<Slot> _slotRepo;
         private readonly IRepositoryBase<User> _userRepo;
+        private readonly IRepositoryBase<Membership> _membershipRepo;
 
         public BookingService(IRepositoryBase<Booking> bookingRepo,
                               IRepositoryBase<BookingStatus> bookingStatusRepo,
@@ -29,7 +30,8 @@ namespace Services.Implement
                               IRepositoryBase<PodType> podTypeRepo,
                               IRepositoryBase<Schedule> scheduleRepo,
                               IRepositoryBase<Slot> slotRepo,
-                              IRepositoryBase<User> userRepo)
+                              IRepositoryBase<User> userRepo,
+                              IRepositoryBase<Membership> membershipRepo)
         {
             _bookingRepo = bookingRepo;
             _bookingStatusRepo = bookingStatusRepo;
@@ -39,6 +41,14 @@ namespace Services.Implement
             _scheduleRepo = scheduleRepo;
             _slotRepo = slotRepo;
             _userRepo = userRepo;
+            _membershipRepo = membershipRepo;
+        }
+
+        public async Task<GetBookingResponse> GetAllBookings()
+        {
+            var bookingList = await _bookingRepo.GetAllAsync();
+
+            return new GetBookingResponse { Bookings = bookingList };
         }
 
         public async Task<GetBookingResponse> GetUserBookings(int id)
@@ -50,7 +60,23 @@ namespace Services.Implement
             return new GetBookingResponse { Bookings = userBookings };
         }
 
-        public async Task<GetBookingResponse> GetBookingById(int id, int userId)
+        public async Task<GetBookingResponse> GetBookingById(int id)
+        {
+            var booking = await _bookingRepo.FindByIdAsync(id);
+
+            if (booking == null)
+            {
+                return new GetBookingResponse { Success = false, Message = "Unable to find booking with id " + id };
+            }
+
+            var user = await _userRepo.FindByIdAsync(booking.UserId);
+
+            booking.User = user;
+
+            return new GetBookingResponse { Success = true, Booking = booking };
+        }
+
+        public async Task<GetBookingResponse> GetUserBookingById(int id, int userId)
         {
             var booking = await _bookingRepo.FindByIdAsync(id);
 
@@ -111,6 +137,25 @@ namespace Services.Implement
                 return new CreateBookingResponse { Success = false, Message = "All fields must be provided" };
             }
 
+            var user = await _userRepo.FindByIdAsync(userId);
+
+            int dayDiff = ((request.ArrivalDate).ToDateTime(TimeOnly.MinValue) - DateTime.UtcNow).Days;
+
+            if (user.MembershipId == 2 && dayDiff < 7)
+            {
+                return new CreateBookingResponse { Success = false, Message = "The arrival date must be at least 7 days from now." };
+            }
+
+            if (user.MembershipId == 3 && dayDiff < 3)
+            {
+                return new CreateBookingResponse { Success = false, Message = "The arrival date must be at least 3 days from now." };
+            }
+
+            if (dayDiff > 30)
+            {
+                return new CreateBookingResponse { Success = false, Message = "The arrival date must be within a month from now." };
+            }
+
             var pod = await _podRepo.FindByIdAsync(request.PodId);
 
             if (pod == null)
@@ -131,7 +176,7 @@ namespace Services.Implement
 
                 if (slots.Any())
                 {
-                    var bookedSlot = slots.FirstOrDefault(s => s.Date == request.ArrivalDate &&
+                    var bookedSlot = slots.FirstOrDefault(s => s.ArrivalDate == request.ArrivalDate &&
                                                                s.PodId == request.PodId &&
                                                                s.ScheduleId == scheduleId &&
                                                                s.Status == 1);
@@ -173,7 +218,7 @@ namespace Services.Implement
                 var slot = new Slot
                 {
                     Status = 1,
-                    Date = request.ArrivalDate,
+                    ArrivalDate = request.ArrivalDate,
                     ScheduleId = scheduleId,
                     PodId = request.PodId
                 };
@@ -189,7 +234,6 @@ namespace Services.Implement
 
                 var bookingDetail = new BookingDetail
                 {
-                    ArrivalDate = request.ArrivalDate,
                     BookingId = booking.Id,
                     SlotId = slot.Id
                 };
@@ -271,6 +315,25 @@ namespace Services.Implement
                 return new UpdateBookingResponse { Success = false, Message = "There is no pod with the id " + request.NewPodId + "." };
             }
 
+            var user = await _userRepo.FindByIdAsync(userId);
+
+            int dayDiff = ((request.NewArrivalDate).ToDateTime(TimeOnly.MinValue) - DateTime.UtcNow).Days;
+
+            if (user.MembershipId == 2 && dayDiff < 7)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "The arrival date must be at least 7 days from now." };
+            }
+
+            if (user.MembershipId == 3 && dayDiff < 3)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "The arrival date must be at least 3 days from now." };
+            }
+
+            if (dayDiff > 30)
+            {
+                return new UpdateBookingResponse { Success = false, Message = "The arrival date must be within a month from now." };
+            }
+
             foreach (var newScheduleId in request.NewScheduleIds)
             {
                 var newSchedule = await _scheduleRepo.FindByIdAsync(newScheduleId);
@@ -284,7 +347,7 @@ namespace Services.Implement
 
                 if (slots.Any())
                 {
-                    var newBookedSlot = slots.FirstOrDefault(s => s.Date == request.NewArrivalDate &&
+                    var newBookedSlot = slots.FirstOrDefault(s => s.ArrivalDate == request.NewArrivalDate &&
                                                                s.PodId == request.NewPodId &&
                                                                s.ScheduleId == newScheduleId &&
                                                                s.Status == 1);
@@ -343,7 +406,7 @@ namespace Services.Implement
                 var slot = new Slot
                 {
                     Status = 1,
-                    Date = request.NewArrivalDate,
+                    ArrivalDate = request.NewArrivalDate,
                     ScheduleId = newScheduleId,
                     PodId = request.NewPodId
                 };
@@ -359,7 +422,6 @@ namespace Services.Implement
 
                 var bookingDetail = new BookingDetail
                 {
-                    ArrivalDate = request.NewArrivalDate,
                     BookingId = booking.Id,
                     SlotId = slot.Id
                 };
@@ -378,6 +440,34 @@ namespace Services.Implement
             }
 
             return new UpdateBookingResponse { Success = true, Booking = booking };
+        }
+
+        public async Task<FinishBookingResponse> FinishBooking(int id)
+        {
+            var booking = await _bookingRepo.FindByIdAsync(id);
+
+            if (booking == null)
+            {
+                return new FinishBookingResponse { Success = false, Message = "There are no booking with id " + id };
+            }
+
+            if (booking.BookingStatusId != 4)
+            {
+                return new FinishBookingResponse { Success = false, Message = "Only On-going bookings can be finished." };
+            }
+
+            booking.BookingStatusId = 5;
+
+            try
+            {
+                await _bookingRepo.UpdateAsync(booking);
+            }
+            catch (Exception ex)
+            {
+                return new FinishBookingResponse { Success = false, Message = "There has been an error updating the booking." };
+            }
+
+            return new FinishBookingResponse { Success = true, Booking = booking };
         }
     }
 }

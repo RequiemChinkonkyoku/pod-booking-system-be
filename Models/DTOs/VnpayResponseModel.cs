@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.DTOs
 {
-    public class VnPayExecuteResponse
+    public class VnpayResponseModel
     {
         public string OrderDescription { get; set; }
         public string TransactionId { get; set; }
@@ -14,6 +14,7 @@ namespace Models.DTOs
         public string PaymentMethod { get; set; }
         public string PaymentId { get; set; }
         public bool Success { get; set; }
+        public string Message { get; set; }
         public string Token { get; set; }
         public string VnPayResponseCode { get; set; }
     }
