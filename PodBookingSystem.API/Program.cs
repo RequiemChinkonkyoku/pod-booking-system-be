@@ -57,7 +57,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
 
-builder.Services.Configure<VnPayOptionModel>(builder.Configuration.GetSection("VnPay"));
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 builder.Services.AddSwaggerGen(c =>

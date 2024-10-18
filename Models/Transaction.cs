@@ -22,5 +22,8 @@ namespace Models
 
         public int BookingId { get; set; }
         public Booking Booking { get; set; }
+
+        public string OrderId { get; set; }
+        public string PaymentId { get; set; }
     }
 }

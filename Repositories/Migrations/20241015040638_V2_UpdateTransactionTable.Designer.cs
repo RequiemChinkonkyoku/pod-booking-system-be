@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241015040638_V2_UpdateTransactionTable")]
+    partial class V2_UpdateTransactionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,7 +92,7 @@ namespace Repositories.Migrations
                             Id = 1,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 10, 15, 13, 18, 28, 496, DateTimeKind.Local).AddTicks(9718),
+                            CreatedTime = new DateTime(2024, 10, 15, 11, 6, 37, 307, DateTimeKind.Local).AddTicks(7553),
                             UserId = 1
                         },
                         new
@@ -97,7 +100,7 @@ namespace Repositories.Migrations
                             Id = 2,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 10, 15, 13, 18, 28, 496, DateTimeKind.Local).AddTicks(9730),
+                            CreatedTime = new DateTime(2024, 10, 15, 11, 6, 37, 307, DateTimeKind.Local).AddTicks(7573),
                             UserId = 2
                         });
                 });
@@ -110,10 +113,16 @@ namespace Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateOnly>("ArrivalDate")
+                        .HasColumnType("date");
+
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
 
                     b.Property<int>("SlotId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SlotPrice")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -551,11 +560,11 @@ namespace Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("ArrivalDate")
-                        .HasColumnType("date");
-
                     b.Property<int?>("BookingDetailId")
                         .HasColumnType("int");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<int?>("PodId")
                         .HasColumnType("int");
@@ -669,7 +678,7 @@ namespace Repositories.Migrations
                             MembershipId = 2,
                             Name = "CUSTOMER",
                             Password = "Customer@1234",
-                            PasswordHash = "$2a$11$Na3EtpBysuWSvrNy4j38xuzTvAjOFJBgRBlgSVfuz/foweXqpz7.W",
+                            PasswordHash = "$2a$11$tLa.5HjRT.9Gnzq.zGmuL.cLuVAAxc0Ug4luLcWcbq27.x5tVGRMa",
                             RoleId = 1,
                             Status = 1
                         },
@@ -680,7 +689,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "STAFF",
                             Password = "Staff@1234",
-                            PasswordHash = "$2a$11$PtQzsaDn324o9LjfO.37rec5eqbzqKOKDMdZ9/Bvoa0RSb/j2lWYi",
+                            PasswordHash = "$2a$11$4T9uXOJUVYEcPPB2taeHoeuNTKfIa8HldLiTF7S3LXZFBdo1U2j8a",
                             RoleId = 2,
                             Status = 1
                         },
@@ -691,7 +700,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "MANAGER",
                             Password = "Manager@1234",
-                            PasswordHash = "$2a$11$1yTypC/ZXkkU4azv2MpvYO5/NtutLPBGQNmh6WI99sr8OJF4SO232",
+                            PasswordHash = "$2a$11$3Xl9A/nS.ILuCu1go/vcd.6oufzpfh4B6m7RpoJAhBcba678Pp37y",
                             RoleId = 3,
                             Status = 1
                         },
@@ -702,7 +711,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "ADMIN",
                             Password = "Admin@1234",
-                            PasswordHash = "$2a$11$Ni58tMDLDzwx3riC6LBdtOD/st0TneJP29/bi22CLvUwJ5balcyDu",
+                            PasswordHash = "$2a$11$pw5j3DIRbVrjE/yyVHZEr.s4ACBwFYo9vjJjaNbtuu6zsHU7y1M0u",
                             RoleId = 4,
                             Status = 1
                         });
