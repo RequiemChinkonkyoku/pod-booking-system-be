@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Models;
 using Models.DTOs;
 using Repositories.Interface;
 using Services.Interface;
+using System.Net.WebSockets;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 
 namespace PodBookingSystem.API.Controllers
@@ -87,6 +90,25 @@ namespace PodBookingSystem.API.Controllers
             {
                 return BadRequest(response.Message);
             }
+        }
+
+        [HttpPost("cancel-membership")]
+        public async Task<IActionResult> CancelMembership()
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _memberService.CancelMembership(userId);
+
+            return null;
         }
     }
 }

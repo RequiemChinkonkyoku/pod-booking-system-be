@@ -104,5 +104,35 @@ namespace Services.Implement
 
             return new MembershipSignUpResponse { Success = true, Membership = membership };
         }
+
+        public async Task<bool> CancelMembership(int userId)
+        {
+            var result = true;
+
+            var user = await _userRepo.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                result = false;
+            }
+
+            if (user.MembershipId == 1)
+            {
+                return false;
+            }
+
+            user.MembershipId = 2;
+
+            try
+            {
+                await _userRepo.UpdateAsync(user);
+            }
+            catch (Exception ex)
+            {
+                result = false;
+            }
+
+            return result;
+        }
     }
 }
