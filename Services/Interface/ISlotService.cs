@@ -10,6 +10,7 @@ namespace Services.Interface
     public interface ISlotService
     {
         public Task<List<Slot>> GetSlotBySlotTypeAsync(int id);
+        public Task<List<Slot>> GetFullyBookedSlotByPodTypeAsync(int podTypeId);
 
     }
 }

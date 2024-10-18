@@ -13,12 +13,13 @@ namespace Services.Implement
     {
         private readonly IRepositoryBase<Slot> _slotRepo;
         private readonly IRepositoryBase<Pod> _podRepo;
+        private readonly IRepositoryBase<Schedule> _scheduleRepo;
 
-        public SlotService(IRepositoryBase<Slot> slotRepo, IRepositoryBase<Pod> podRepo)
+        public SlotService(IRepositoryBase<Slot> slotRepo, IRepositoryBase<Pod> podRepo, IRepositoryBase<Schedule> scheduleRepo)
         {
             _slotRepo = slotRepo;
             _podRepo = podRepo;
-
+            _scheduleRepo = scheduleRepo;
         }
 
 
@@ -36,6 +37,27 @@ namespace Services.Implement
                 .ToList();
 
             return filteredSlots;
+        }
+
+        public async Task<List<Slot>> GetFullyBookedSlotByPodTypeAsync(int podTypeId)
+        {
+            var allPods = await _podRepo.GetAllAsync();
+            var relevantPodIds = allPods
+                .Where(p => p.PodTypeId == podTypeId && p.Status == 1)
+                .Select(p => p.Id)
+                .ToList();
+
+            var allSlots = await _slotRepo.GetAllAsync();
+
+            var fullyBookedSlots = allSlots
+                .Where(s => s.PodId.HasValue && relevantPodIds.Contains(s.PodId.Value))
+                .GroupBy(s => s.ScheduleId)
+                .Where(g => g.Select(slot => slot.PodId).Distinct().Count() == relevantPodIds.Count)
+                .SelectMany(g => g)
+                .ToList();
+
+            return fullyBookedSlots;
+
         }
     }
 }
