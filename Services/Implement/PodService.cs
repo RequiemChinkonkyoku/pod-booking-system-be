@@ -128,5 +128,19 @@ namespace Services.Implement
             return existingPod;
         }
 
+        public async Task<List<Pod>> GetAvailablePodsByPodTypeAsync(int podTypeId, int scheduleId, DateOnly arrivalDate)
+        {
+            var allPods = await _podRepo.GetAllAsync();
+
+            var allSlots = await _slotRepo.GetAllAsync();
+
+            var availablePods = allPods
+                .Where(p => p.PodTypeId == podTypeId &&
+                            p.Status == 1 &&
+                            !allSlots.Any(s => s.PodId == p.Id && s.ScheduleId == scheduleId && s.ArrivalDate == arrivalDate)) // Exclude pods that have slots on the specified ScheduleId and ArrivalDate
+                .ToList();
+
+            return availablePods;
+        }
     }
 }

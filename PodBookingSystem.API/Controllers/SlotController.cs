@@ -24,5 +24,18 @@ namespace PodBookingSystem.API.Controllers
             }
             return Ok(slots);
         }
+
+        [HttpGet("FullSlot/PodType/{id}")]
+        public async Task<IActionResult> GetFullyBookedSlotsByPodType(int id)
+        {
+            var fullyBookedSlots = await _slotService.GetFullyBookedSlotByPodTypeAsync(id);
+
+            if (fullyBookedSlots == null || fullyBookedSlots.Count == 0)
+            {
+                return NotFound($"No fully booked slots found for PodType with ID {id}.");
+            }
+
+            return Ok(fullyBookedSlots);
+        }
     }
 }

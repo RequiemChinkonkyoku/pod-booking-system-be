@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Models.DTOs
 {
-    public class CreatePaymentResponse
+    public class FinishBookingResponse
     {
         public bool Success { get; set; }
 
         public string Message { get; set; }
 
-        public MomoPaymentResponse MomoPaymentResponse { get; set; }
+        public Booking Booking { get; set; }
     }
 }
