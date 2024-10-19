@@ -31,20 +31,16 @@ namespace PodBookingSystem.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMembershipById([FromRoute] int id)
         {
-            int userId = 0;
-
-            try
-            {
-                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized("You must login to perform this task.");
-            }
-
             var response = await _memberService.GetMembershipById(id);
 
-            return Ok(response);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
         }
 
         [HttpPost]
@@ -63,7 +59,66 @@ namespace PodBookingSystem.API.Controllers
 
             var response = await _memberService.CreateMembership(request);
 
-            return Ok(response);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateMembership([FromRoute] int id, [FromBody] UpdateMembershipRequest request)
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _memberService.UpdateMembership(id, request);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
+        }
+
+        [HttpPut("toggle/{id}")]
+        public async Task<IActionResult> ToggleMembership([FromRoute] int id)
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _memberService.ToggleMembership(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
         }
 
         [HttpPost("sign-up")]
@@ -92,25 +147,6 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpPost("change-membership")]
-        public async Task<IActionResult> ChangeMembership([FromRoute] int id)
-        {
-            int userId = 0;
-
-            try
-            {
-                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized("You must login to perform this task.");
-            }
-
-            var response = await _memberService.ChangeMembership(id, userId);
-
-            return Ok();
-        }
-
         [HttpPost("cancel-membership")]
         public async Task<IActionResult> CancelMembership()
         {
@@ -127,7 +163,14 @@ namespace PodBookingSystem.API.Controllers
 
             var response = await _memberService.CancelMembership(userId);
 
-            return null;
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
         }
     }
 }

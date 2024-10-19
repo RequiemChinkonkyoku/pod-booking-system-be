@@ -11,10 +11,11 @@ namespace Services.Interface
     public interface IMembershipService
     {
         public Task<List<Membership>> ViewAllMembership();
-        public Task<GetMembershipResponse> GetMembershipById(int id);
-        public Task<CreateMembershipResponse> CreateMembership(CreateMembershipRequest request);
-        public Task<MembershipSignUpResponse> SignUp(int id, int userId);
-        public Task<ChangemembershipResponse> ChangeMembership(int id, int userId);
-        public Task<bool> CancelMembership(int userId);
+        public Task<MembershipServiceResponse> GetMembershipById(int id);
+        public Task<MembershipServiceResponse> CreateMembership(CreateMembershipRequest request);
+        public Task<MembershipServiceResponse> UpdateMembership(int id, UpdateMembershipRequest request);
+        public Task<MembershipServiceResponse> ToggleMembership(int id);
+        public Task<MembershipServiceResponse> SignUp(int id, int userId);
+        public Task<MembershipServiceResponse> CancelMembership(int userId);
     }
 }
