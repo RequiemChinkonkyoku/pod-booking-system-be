@@ -48,6 +48,23 @@ namespace Services.Implement
         {
             var bookingList = await _bookingRepo.GetAllAsync();
 
+            foreach (var booking in bookingList)
+            {
+                var user = await _userRepo.FindByIdAsync(booking.UserId);
+                booking.User = user;
+
+                var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+                var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
+                booking.BookingDetails = userDetails;
+
+                foreach (var detail in userDetails)
+                {
+                    var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                    detail.Slot = slot;
+                }
+            }
+
             return new GetBookingResponse { Bookings = bookingList };
         }
 
@@ -56,6 +73,23 @@ namespace Services.Implement
             var bookingList = await _bookingRepo.GetAllAsync();
 
             var userBookings = bookingList.Where(b => b.UserId == id).ToList();
+
+            foreach (var booking in userBookings)
+            {
+                var user = await _userRepo.FindByIdAsync(booking.UserId);
+                booking.User = user;
+
+                var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+                var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
+                booking.BookingDetails = userDetails;
+
+                foreach (var detail in userDetails)
+                {
+                    var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                    detail.Slot = slot;
+                }
+            }
 
             return new GetBookingResponse { Bookings = userBookings };
         }
