@@ -70,8 +70,18 @@ namespace Services.Implement
             }
 
             var user = await _userRepo.FindByIdAsync(booking.UserId);
-
             booking.User = user;
+
+            var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+            var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
+            booking.BookingDetails = userDetails;
+
+            foreach (var detail in userDetails)
+            {
+                var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                detail.Slot = slot;
+            }
 
             return new GetBookingResponse { Success = true, Booking = booking };
         }
@@ -90,9 +100,19 @@ namespace Services.Implement
                 return new GetBookingResponse { Success = false, Message = "The booking does not belong to this user" };
             }
 
-            var user = await _userRepo.FindByIdAsync(userId);
-
+            var user = await _userRepo.FindByIdAsync(booking.UserId);
             booking.User = user;
+
+            var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+            var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
+            booking.BookingDetails = userDetails;
+
+            foreach (var detail in userDetails)
+            {
+                var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                detail.Slot = slot;
+            }
 
             return new GetBookingResponse { Success = true, Booking = booking };
         }
