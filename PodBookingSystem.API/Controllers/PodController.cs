@@ -92,8 +92,25 @@ namespace PodBookingSystem.API.Controllers
                 return StatusCode(500, "An error occurred while deleting the pod.");
             }
         }
+        [HttpGet("PodType/{id}")]
+        public async Task<IActionResult> GetAvailablePods(int id, int scheduleId, DateOnly arrivalDate)
+        {
+            if (id <= 0 || scheduleId <= 0 )
+            {
+                return BadRequest("Invalid input parameters.");
+            }
+            if (arrivalDate < DateOnly.FromDateTime(DateTime.Now))
+            {
+                return BadRequest("Arrival Date must be today or further");
+            }
+            var availablePods = await _podService.GetAvailablePodsByPodTypeAsync(id, scheduleId, arrivalDate);
 
+            if (availablePods == null || !availablePods.Any())
+            {
+                return NotFound("No available pods found for the given parameters.");
+            }
 
-
+            return Ok(availablePods);
+        }
     }
 }

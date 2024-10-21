@@ -15,5 +15,6 @@ namespace Services.Interface
         public Task<Pod> AddPodAsync(PodDto podDto);
         public Task<Pod> UpdatePodAsync(int id, PodDto podDto);
         public Task<Pod> DeletePodAsync(int podId);
+        public Task<List<Pod>> GetAvailablePodsByPodTypeAsync(int podTypeId, int scheduleId, DateOnly arrivalDate);
     }
 }
