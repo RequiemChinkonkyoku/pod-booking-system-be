@@ -83,11 +83,21 @@ namespace Services.Implement
 
                 foreach (var detail in userDetails)
                 {
-                    var slot = _slotRepo.FindByIdAsync(detail.SlotId).Result;
+                    var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                    if (slot == null)
+                    {
+                        return new GetBookingResponse { Message = "Slot is null." };
+                    }
 
                     arrivalDate = slot.ArrivalDate;
 
-                    var schedule = _scheduleRepo.FindByIdAsync(slot.ScheduleId.Value).Result;
+                    var schedule = await _scheduleRepo.FindByIdAsync(slot.ScheduleId.Value);
+
+                    if (schedule == null)
+                    {
+                        return new GetBookingResponse { Message = "Schedule is null." };
+                    }
 
                     if (schedule.StartTime < startTime)
                     {
@@ -99,9 +109,20 @@ namespace Services.Implement
                         endTime = schedule.EndTime;
                     }
 
-                    podTypeId = slot.PodId.Value;
+                    var pod = await _podRepo.FindByIdAsync(slot.PodId.Value);
 
+                    if (pod == null)
+                    {
+                        return new GetBookingResponse { Message = "Pod is null." };
+                    }
+
+                    podTypeId = pod.PodTypeId;
                     podType = await _podTypeRepo.FindByIdAsync(podTypeId);
+
+                    if (podType == null)
+                    {
+                        return new GetBookingResponse { Message = "PodType is null." };
+                    }
                 }
 
                 var bookingOverview = new BookingOverviewDto
@@ -161,11 +182,21 @@ namespace Services.Implement
 
                 foreach (var detail in userDetails)
                 {
-                    var slot = _slotRepo.FindByIdAsync(detail.SlotId).Result;
+                    var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                    if (slot == null)
+                    {
+                        return new GetBookingResponse { Message = "Slot is null." };
+                    }
 
                     arrivalDate = slot.ArrivalDate;
 
-                    var schedule = _scheduleRepo.FindByIdAsync(slot.ScheduleId.Value).Result;
+                    var schedule = await _scheduleRepo.FindByIdAsync(slot.ScheduleId.Value);
+
+                    if (schedule == null)
+                    {
+                        return new GetBookingResponse { Message = "Schedule is null." };
+                    }
 
                     if (schedule.StartTime < startTime)
                     {
@@ -177,9 +208,20 @@ namespace Services.Implement
                         endTime = schedule.EndTime;
                     }
 
-                    podTypeId = slot.PodId.Value;
+                    var pod = await _podRepo.FindByIdAsync(slot.PodId.Value);
 
+                    if (pod == null)
+                    {
+                        return new GetBookingResponse { Message = "Pod is null." };
+                    }
+
+                    podTypeId = pod.PodTypeId;
                     podType = await _podTypeRepo.FindByIdAsync(podTypeId);
+
+                    if (podType == null)
+                    {
+                        return new GetBookingResponse { Message = "PodType is null." };
+                    }
                 }
 
                 var bookingOverview = new BookingOverviewDto
