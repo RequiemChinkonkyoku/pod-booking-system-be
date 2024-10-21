@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,52 +47,156 @@ namespace Services.Implement
 
         public async Task<GetBookingResponse> GetAllBookings()
         {
+            //var bookingList = await _bookingRepo.GetAllAsync();
+            //var bookingOverviews = new List<BookingOverviewDto>();
+
+            //foreach (var booking in bookingList)
+            //{
+            //    var user = await _userRepo.FindByIdAsync(booking.UserId);
+            //    booking.User = user;
+
+            //    var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+            //    var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
+            //    booking.BookingDetails = userDetails;
+
+            //    foreach (var detail in userDetails)
+            //    {
+            //        var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+            //        detail.Slot = slot;
+            //    }
+            //}
+
             var bookingList = await _bookingRepo.GetAllAsync();
+            var bookingOverviews = new List<BookingOverviewDto>();
 
             foreach (var booking in bookingList)
             {
-                var user = await _userRepo.FindByIdAsync(booking.UserId);
-                booking.User = user;
+                var arrivalDate = DateOnly.MinValue;
+                var startTime = TimeOnly.MaxValue;
+                var endTime = TimeOnly.MinValue;
+                var podTypeId = 0;
+                var podType = new PodType();
 
                 var bookingDetails = await _bookingDetailRepo.GetAllAsync();
                 var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
-                booking.BookingDetails = userDetails;
 
                 foreach (var detail in userDetails)
                 {
-                    var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+                    var slot = _slotRepo.FindByIdAsync(detail.SlotId).Result;
 
-                    detail.Slot = slot;
+                    arrivalDate = slot.ArrivalDate;
+
+                    var schedule = _scheduleRepo.FindByIdAsync(slot.ScheduleId.Value).Result;
+
+                    if (schedule.StartTime < startTime)
+                    {
+                        startTime = schedule.StartTime;
+                    }
+
+                    if (schedule.EndTime > endTime)
+                    {
+                        endTime = schedule.EndTime;
+                    }
+
+                    podTypeId = slot.PodId.Value;
+
+                    podType = await _podTypeRepo.FindByIdAsync(podTypeId);
                 }
+
+                var bookingOverview = new BookingOverviewDto
+                {
+                    BookingId = booking.Id,
+                    ArrivalDate = arrivalDate,
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    StatusId = booking.BookingStatusId,
+                    PodTypeId = podTypeId,
+                    PodTypeName = podType.Name,
+                };
+
+                bookingOverviews.Add(bookingOverview);
             }
 
-            return new GetBookingResponse { Bookings = bookingList };
+            return new GetBookingResponse { BookingOverview = bookingOverviews };
         }
 
         public async Task<GetBookingResponse> GetUserBookings(int id)
         {
+            //var bookingList = await _bookingRepo.GetAllAsync();
+
+            //var userBookings = bookingList.Where(b => b.UserId == id).ToList();
+
+            //foreach (var booking in userBookings)
+            //{
+            //    var user = await _userRepo.FindByIdAsync(booking.UserId);
+            //    booking.User = user;
+
+            //    var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+            //    var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
+            //    booking.BookingDetails = userDetails;
+
+            //    foreach (var detail in userDetails)
+            //    {
+            //        var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+            //        detail.Slot = slot;
+            //    }
+            //}
+
             var bookingList = await _bookingRepo.GetAllAsync();
-
             var userBookings = bookingList.Where(b => b.UserId == id).ToList();
+            var bookingOverviews = new List<BookingOverviewDto>();
 
-            foreach (var booking in userBookings)
+            foreach (var booking in bookingList)
             {
-                var user = await _userRepo.FindByIdAsync(booking.UserId);
-                booking.User = user;
+                var arrivalDate = DateOnly.MinValue;
+                var startTime = TimeOnly.MaxValue;
+                var endTime = TimeOnly.MinValue;
+                var podTypeId = 0;
+                var podType = new PodType();
 
                 var bookingDetails = await _bookingDetailRepo.GetAllAsync();
                 var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
-                booking.BookingDetails = userDetails;
 
                 foreach (var detail in userDetails)
                 {
-                    var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+                    var slot = _slotRepo.FindByIdAsync(detail.SlotId).Result;
 
-                    detail.Slot = slot;
+                    arrivalDate = slot.ArrivalDate;
+
+                    var schedule = _scheduleRepo.FindByIdAsync(slot.ScheduleId.Value).Result;
+
+                    if (schedule.StartTime < startTime)
+                    {
+                        startTime = schedule.StartTime;
+                    }
+
+                    if (schedule.EndTime > endTime)
+                    {
+                        endTime = schedule.EndTime;
+                    }
+
+                    podTypeId = slot.PodId.Value;
+
+                    podType = await _podTypeRepo.FindByIdAsync(podTypeId);
                 }
+
+                var bookingOverview = new BookingOverviewDto
+                {
+                    BookingId = booking.Id,
+                    ArrivalDate = arrivalDate,
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    StatusId = booking.BookingStatusId,
+                    PodTypeId = podTypeId,
+                    PodTypeName = podType.Name,
+                };
+
+                bookingOverviews.Add(bookingOverview);
             }
 
-            return new GetBookingResponse { Bookings = userBookings };
+            return new GetBookingResponse { BookingOverview = bookingOverviews };
         }
 
         public async Task<GetBookingResponse> GetBookingById(int id)
