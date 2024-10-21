@@ -39,6 +39,32 @@ namespace PodBookingSystem.API.Controllers
             return Ok(response.Bookings);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBookingById([FromRoute] int id)
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name)?.Value.ToString());
+            }
+            catch (Exception)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _bookingService.GetBookingById(id);
+
+            if (response.Success)
+            {
+                return Ok(response.Booking);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
+        }
+
         [HttpGet("customer")]
         public async Task<IActionResult> GetCustomerBooking()
         {
