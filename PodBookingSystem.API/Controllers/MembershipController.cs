@@ -35,7 +35,7 @@ namespace PodBookingSystem.API.Controllers
 
             if (response.Success)
             {
-                return Ok(response);
+                return Ok(response.Membership);
             }
             else
             {
@@ -61,7 +61,7 @@ namespace PodBookingSystem.API.Controllers
 
             if (response.Success)
             {
-                return Ok(response);
+                return Ok(response.Membership);
             }
             else
             {
@@ -87,7 +87,7 @@ namespace PodBookingSystem.API.Controllers
 
             if (response.Success)
             {
-                return Ok(response);
+                return Ok(response.Membership);
             }
             else
             {
@@ -113,7 +113,7 @@ namespace PodBookingSystem.API.Controllers
 
             if (response.Success)
             {
-                return Ok(response);
+                return Ok(response.Membership);
             }
             else
             {
@@ -165,7 +165,7 @@ namespace PodBookingSystem.API.Controllers
 
             if (response.Success)
             {
-                return Ok(response);
+                return Ok(response.Membership);
             }
             else
             {
