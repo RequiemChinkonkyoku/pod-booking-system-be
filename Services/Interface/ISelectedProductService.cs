@@ -10,9 +10,10 @@ namespace Services.Interface
 {
     public interface ISelectedProductService
     {
-        public Task<List<SelectedProduct>> GetAllSelectedProductAsync();
-        public Task<SelectedProduct> GetProductByIDAsync(int id);
-        public Task<SelectedProduct> CreateSelectedProductAsync(SelectedProductDto selectedProductDto);
-        public Task<SelectedProduct> UpdateSelectedProductAsync(int id, SelectedProductDto selectedProductDto);
+        Task<List<SelectedProduct>> GetAllSelectedProductAsync();
+        Task<SelectedProduct> GetProductByIDAsync(int id);
+        Task<SelectedProduct> CreateSelectedProductAsync(SelectedProductDto selectedProductDto);
+        Task<SelectedProduct> UpdateSelectedProductAsync(int id, SelectedProductDto selectedProductDto);
+        Task<bool> DeleteSelectedProductAsync(int id);
     }
 }

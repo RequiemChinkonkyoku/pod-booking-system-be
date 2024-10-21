@@ -62,5 +62,19 @@ namespace PodBookingSystem.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSelectedProduct([FromRoute] int id)
+        {
+            try
+            {
+                var selectedProduct = await _selectedProductService.DeleteSelectedProductAsync(id);
+                return Ok(selectedProduct);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

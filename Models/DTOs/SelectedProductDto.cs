@@ -9,7 +9,7 @@ namespace Models.DTOs
     public class SelectedProductDto
     {
         public int Quantity { get; set; }
-        public int ProductPrice { get; set; }
+        //public int ProductPrice { get; set; }
         public int BookingId { get; set; }
         public int ProductId { get; set; }
     }

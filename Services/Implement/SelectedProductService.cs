@@ -53,13 +53,18 @@ namespace Services.Implement
                 throw new Exception("Product does not exist");
             }
 
+            var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
+
             var selectedProduct = new SelectedProduct
             {
                 Quantity = selectedProductDto.Quantity,
-                ProductPrice = selectedProductDto.ProductPrice,
+                ProductPrice = product.Price,
                 ProductId = selectedProductDto.ProductId,
                 BookingId = selectedProductDto.BookingId,   
             };
+
+            await _selectedProductRepo.AddAsync(selectedProduct);
+
             return  selectedProduct;
         }
 
@@ -81,12 +86,31 @@ namespace Services.Implement
             {
                 throw new Exception("Selected Product NotFound");
             }
+
+            var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
+
             existingSelectedProduct.Quantity = selectedProductDto.Quantity;
-            existingSelectedProduct.ProductPrice = selectedProductDto.ProductPrice;
+            existingSelectedProduct.ProductPrice = product.Price;
             existingSelectedProduct.ProductId = selectedProductDto.ProductId;
             existingSelectedProduct.BookingId = selectedProductDto.BookingId;
 
+            await _selectedProductRepo.UpdateAsync(existingSelectedProduct);
+
             return existingSelectedProduct;
+        }
+
+        public async Task<bool> DeleteSelectedProductAsync(int id)
+        {
+            bool result = false;
+            var product = await _selectedProductRepo.FindByIdAsync(id);
+            
+            if (product != null)
+            {
+                await _selectedProductRepo.DeleteAsync(product);
+                result = true;
+            }
+
+            return result;
         }
     }
 }
