@@ -36,7 +36,7 @@ namespace PodBookingSystem.API.Controllers
 
             var response = await _bookingService.GetAllBookings();
 
-            return Ok(response.Bookings);
+            return Ok(response.BookingOverview);
         }
 
         [HttpGet("{id}")]
@@ -81,7 +81,7 @@ namespace PodBookingSystem.API.Controllers
 
             var response = await _bookingService.GetUserBookings(userId);
 
-            return Ok(response.Bookings);
+            return Ok(response.BookingOverview);
         }
 
         [HttpGet("customer/{id}")]
