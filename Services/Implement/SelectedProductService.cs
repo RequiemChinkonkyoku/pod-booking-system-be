@@ -60,6 +60,7 @@ namespace Services.Implement
                 ProductId = selectedProductDto.ProductId,
                 BookingId = selectedProductDto.BookingId,   
             };
+
             return  selectedProduct;
         }
 

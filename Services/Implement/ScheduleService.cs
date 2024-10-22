@@ -24,5 +24,31 @@ namespace Services.Implement
             var schedules = await _scheduleRepo.GetAllAsync();
             return schedules;
         }
+
+        public async Task<Schedule> GetSchedulesByIds(List<int> scheduleIdList)
+        {
+            Schedule result = new Schedule
+            {
+                StartTime = TimeOnly.MaxValue,
+                EndTime = TimeOnly.MinValue
+            };
+            foreach (var scheduleId in scheduleIdList)
+            {
+                var schedule = await _scheduleRepo.FindByIdAsync(scheduleId);
+                if (schedule == null)
+                {
+                    return null;
+                }
+                if (schedule.StartTime < result.StartTime)
+                {
+                    result.StartTime = schedule.StartTime;
+                }
+                if (schedule.EndTime > result.EndTime)
+                {
+                    result.EndTime = schedule.EndTime;
+                }
+            }
+            return result;
+        }
     }
 }

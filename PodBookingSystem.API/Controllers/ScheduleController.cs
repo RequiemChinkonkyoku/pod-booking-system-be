@@ -19,5 +19,12 @@ namespace PodBookingSystem.API.Controllers
             var response = await _scheduleService.GetAllSchedulesAsync();
             return Ok(response);
         }
+
+        [HttpPost("Ids")]
+        public async Task<IActionResult> GetSchedulesByIds([FromBody] List<int> scheduleIdList)
+        {
+            var response = await _scheduleService.GetSchedulesByIds(scheduleIdList);
+            return Ok(response);
+        }
     }
 }

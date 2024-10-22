@@ -10,5 +10,6 @@ namespace Services.Interface
     public interface IScheduleService
     {
         Task<List<Schedule>> GetAllSchedulesAsync();
+        Task<Schedule> GetSchedulesByIds(List<int> scheduleIdList);
     }
 }
