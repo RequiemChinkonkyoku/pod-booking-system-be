@@ -92,10 +92,10 @@ namespace PodBookingSystem.API.Controllers
                 return StatusCode(500, "An error occurred while deleting the pod.");
             }
         }
-        [HttpGet("PodType/{id}")]
-        public async Task<IActionResult> GetAvailablePods(int id, int scheduleId, DateOnly arrivalDate)
+        [HttpGet("Available/{podTypeId}")]
+        public async Task<IActionResult> GetAvailablePods(int podTypeId, int scheduleId, DateOnly arrivalDate)
         {
-            if (id <= 0 || scheduleId <= 0 )
+            if (podTypeId <= 0 || scheduleId <= 0 )
             {
                 return BadRequest("Invalid input parameters.");
             }
@@ -103,7 +103,7 @@ namespace PodBookingSystem.API.Controllers
             {
                 return BadRequest("Arrival Date must be today or further");
             }
-            var availablePods = await _podService.GetAvailablePodsByPodTypeAsync(id, scheduleId, arrivalDate);
+            var availablePods = await _podService.GetAvailablePodsByPodTypeAsync(podTypeId, scheduleId, arrivalDate);
 
             if (availablePods == null || !availablePods.Any())
             {

@@ -53,7 +53,7 @@ namespace Services.Implement
                     new Claim(ClaimTypes.Email, email),
                     new Claim(ClaimTypes.Role, user.RoleId.ToString())
                 }),
-                    Expires = DateTime.UtcNow.AddMinutes(15),
+                    Expires = DateTime.UtcNow.AddMinutes(90),
                     Issuer = config["Jwt:Issuer"],
                     Audience = config["Jwt:Audience"],
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
