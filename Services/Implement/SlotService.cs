@@ -52,7 +52,7 @@ namespace Services.Implement
             var allSlots = await _slotRepo.GetAllAsync();
 
             var fullyBookedSlots = allSlots
-                .Where(s => s.PodId.HasValue && relevantPodIds.Contains(s.PodId.Value))
+                .Where(s => s.PodId.HasValue && relevantPodIds.Contains(s.PodId.Value) && s.Status == 1)
                 .GroupBy(s => new { s.ScheduleId, s.ArrivalDate }) 
                 .Where(g => g.Select(slot => slot.PodId).Distinct().Count() == relevantPodIds.Count)
                 .Select(g => new FullyBookedSlotDto
