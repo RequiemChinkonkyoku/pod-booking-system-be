@@ -395,7 +395,7 @@ namespace Services.Implement
                 }
             }
 
-            var podPrice = _podTypeRepo.FindByIdAsync(pod.PodTypeId).Result.Price;
+            var podPrice = (_podTypeRepo.FindByIdAsync(pod.PodTypeId).Result.Price) * request.ScheduleIds.Count;
 
             var booking = new Booking
             {
