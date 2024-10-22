@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Models.DTOs;
 using Services.Interface;
+using System.Security.Claims;
 
 namespace PodBookingSystem.API.Controllers
 {
@@ -22,9 +23,9 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreatePaymentUrl([FromBody] VnpayInfoModel request)
+        public async Task<IActionResult> CreatePaymentUrl([FromBody] VnpayInfoModel request)
         {
-            var url = _vnpService.CreatePaymentUrl(request, HttpContext);
+            var url = await _vnpService.CreatePaymentUrl(request, HttpContext);
 
             if (url.IsNullOrEmpty())
             {
