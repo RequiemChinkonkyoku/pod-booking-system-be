@@ -87,7 +87,6 @@ namespace Services.Implement
             product.Name = productDto.Name;
             product.Price = productDto.Price;
             product.Description = productDto.Description;
-            product.Status = productDto.Status;
             product.Quantity = productDto.Quantity;
             product.Unit = productDto.Unit;
             product.CategoryId = productDto.CategoryId;
