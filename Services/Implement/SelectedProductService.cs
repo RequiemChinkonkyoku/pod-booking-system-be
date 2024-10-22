@@ -68,13 +68,9 @@ namespace Services.Implement
             return  selectedProduct;
         }
 
-        public async Task<SelectedProduct> UpdateSelectedProductAsync(int id, SelectedProductDto selectedProductDto)
+        public async Task<SelectedProduct> UpdateSelectedProductAsync(int id, UpdateSelectedProductDto selectedProductDto)
         {
             var allbooking = await _bookingRepo.GetAllAsync();
-            if (!allbooking.Any(c => c.Id == selectedProductDto.BookingId))
-            {
-                throw new Exception("Booking does not exist");
-            }
 
             var allProduct = await _productRepo.GetAllAsync();
             if (!allProduct.Any(c => c.Id == selectedProductDto.ProductId))
@@ -92,7 +88,6 @@ namespace Services.Implement
             existingSelectedProduct.Quantity = selectedProductDto.Quantity;
             existingSelectedProduct.ProductPrice = product.Price;
             existingSelectedProduct.ProductId = selectedProductDto.ProductId;
-            existingSelectedProduct.BookingId = selectedProductDto.BookingId;
 
             await _selectedProductRepo.UpdateAsync(existingSelectedProduct);
 
@@ -111,6 +106,18 @@ namespace Services.Implement
             }
 
             return result;
+        }
+
+        public async Task<List<SelectedProduct>> GetSelectedProductByBookingID(int id)
+        {
+            var products = await _selectedProductRepo.GetAllAsync();
+            if (products == null)
+            {
+                throw new Exception("Selected Product does not exist");
+            }
+            var filteredProduct = products.Where(p => p.BookingId == id).ToList();
+
+            return filteredProduct;
         }
     }
 }

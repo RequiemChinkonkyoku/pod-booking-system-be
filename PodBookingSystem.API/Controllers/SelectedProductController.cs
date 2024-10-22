@@ -50,7 +50,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSelectedProduct([FromBody] SelectedProductDto selectedProductDto, int id)
+        public async Task<IActionResult> UpdateSelectedProduct([FromBody] UpdateSelectedProductDto selectedProductDto, int id)
         {
             try
             {
@@ -74,6 +74,21 @@ namespace PodBookingSystem.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("/BookingID/{id}")]
+        public async Task<IActionResult> GetSelecetedProductByBookingID(int id)
+        {
+            try
+            {
+                var selectedProduct = await _selectedProductService.GetSelectedProductByBookingID(id);
+                return Ok(selectedProduct);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+
             }
         }
     }

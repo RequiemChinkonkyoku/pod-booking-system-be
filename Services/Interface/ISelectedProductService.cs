@@ -13,7 +13,9 @@ namespace Services.Interface
         Task<List<SelectedProduct>> GetAllSelectedProductAsync();
         Task<SelectedProduct> GetProductByIDAsync(int id);
         Task<SelectedProduct> CreateSelectedProductAsync(SelectedProductDto selectedProductDto);
-        Task<SelectedProduct> UpdateSelectedProductAsync(int id, SelectedProductDto selectedProductDto);
+        Task<SelectedProduct> UpdateSelectedProductAsync(int id, UpdateSelectedProductDto selectedProductDto);
         Task<bool> DeleteSelectedProductAsync(int id);
+        Task<List<SelectedProduct>> GetSelectedProductByBookingID(int id);
+
     }
 }
