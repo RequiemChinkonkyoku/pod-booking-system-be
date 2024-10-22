@@ -21,9 +21,6 @@ namespace Models.DTOs
         public string Description { get; set; }
 
         [Required]
-        public int Status { get; set; }
-
-        [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than 0.")]
         public int Quantity { get; set; }
 

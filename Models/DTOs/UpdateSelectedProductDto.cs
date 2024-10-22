@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Models.DTOs
 {
-    public class SelectedProductDto
+    public class UpdateSelectedProductDto
     {
         public int Quantity { get; set; }
-        //public int ProductPrice { get; set; }
-        public int BookingId { get; set; }
         public int ProductId { get; set; }
     }
 }
