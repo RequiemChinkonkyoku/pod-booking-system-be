@@ -3,6 +3,7 @@ using Services.Interface;
 
 namespace PodBookingSystem.API.Controllers
 {
+    [Route("[controller]")]
     public class MethodController : Controller
     {
         private readonly IMethodService _methodService;
