@@ -17,5 +17,7 @@ namespace Services.Interface
         Task<User> UpdateUserAsync(int id, UpdateUserDto dto);
         Task<bool> DeleteUserAsync(int id);
         Task<User> GetUserByIdAsync(int id);
+        Task<bool> UserUpdateNameAsync(int id, string name);
+        Task<bool> UserUpdatePassword(int id, string currentPassword, string newPassword);
     }
 }
