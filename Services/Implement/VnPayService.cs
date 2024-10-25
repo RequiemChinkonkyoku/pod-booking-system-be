@@ -22,15 +22,18 @@ namespace Services.Implement
         private readonly IConfiguration _configuration;
         private readonly IRepositoryBase<Booking> _bookingRepo;
         private readonly IRepositoryBase<Transaction> _transactionRepo;
+        private readonly IRepositoryBase<User> _userRepo;
 
-        public VnPayService(IConfiguration configuration, IRepositoryBase<Booking> bookingRepo, IRepositoryBase<Transaction> transactionRepo)
+        public VnPayService(IConfiguration configuration, IRepositoryBase<Booking> bookingRepo, IRepositoryBase<Transaction> transactionRepo, IRepositoryBase<User> userRepo)
         {
             _configuration = configuration;
             _bookingRepo = bookingRepo;
             _transactionRepo = transactionRepo;
+            _userRepo = userRepo;
         }
-        public string CreatePaymentUrl(VnpayInfoModel model, HttpContext context)
+        public async Task<string> CreatePaymentUrl(VnpayInfoModel model, HttpContext context)
         {
+            var user = await _userRepo.FindByIdAsync(model.UserId);
             var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(_configuration["Vnpay:TimeZoneId"]);
             var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
             var tick = DateTime.Now.Ticks.ToString();
@@ -45,7 +48,7 @@ namespace Services.Implement
             pay.AddRequestData("vnp_CurrCode", _configuration["Vnpay:CurrCode"]);
             pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
             pay.AddRequestData("vnp_Locale", _configuration["Vnpay:Locale"]);
-            pay.AddRequestData("vnp_OrderInfo", $"Name: {model.Name}, Amount: {model.Amount}, BookingId: {model.BookingId} ");
+            pay.AddRequestData("vnp_OrderInfo", $"Name: {user.Name}, Amount: {model.Amount}, BookingId: {model.BookingId} ");
             pay.AddRequestData("vnp_OrderType", model.OrderType);
             pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
             pay.AddRequestData("vnp_TxnRef", tick);

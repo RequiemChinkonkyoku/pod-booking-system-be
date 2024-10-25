@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
+using Models;
 using Models.DTOs;
 using Services.Interface;
 using System.Diagnostics;
@@ -36,7 +37,33 @@ namespace PodBookingSystem.API.Controllers
 
             var response = await _bookingService.GetAllBookings();
 
-            return Ok(response.Bookings);
+            return Ok(response.BookingOverview);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBookingById([FromRoute] int id)
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name)?.Value.ToString());
+            }
+            catch (Exception)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _bookingService.GetBookingById(id);
+
+            if (response.Success)
+            {
+                return Ok(response.Booking);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
         }
 
         [HttpGet("customer")]
@@ -55,7 +82,7 @@ namespace PodBookingSystem.API.Controllers
 
             var response = await _bookingService.GetUserBookings(userId);
 
-            return Ok(response.Bookings);
+            return Ok(response.BookingOverview);
         }
 
         [HttpGet("customer/{id}")]
@@ -187,5 +214,20 @@ namespace PodBookingSystem.API.Controllers
                 return BadRequest(response.Message);
             }
         }
+
+        [HttpGet("areaid/{id}")]
+        public async Task<IActionResult> GetBookingByAreaID(int id)
+        {
+            try
+            {
+                var bookings = await _bookingService.GetBookingsByAreaIdAsync(id);
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }
