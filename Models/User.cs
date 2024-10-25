@@ -43,5 +43,7 @@ namespace Models
         public ICollection<Booking> Bookings { get; set; }
 
         public ICollection<UserOtp> UserOtps { get; set; }
+
+        public StaffArea StaffArea { get; set; }
     }
 }

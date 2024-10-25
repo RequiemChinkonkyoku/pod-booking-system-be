@@ -13,6 +13,8 @@ namespace Models.DTOs
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public int StatusId { get; set; }
+        public int PodId { get; set; }
+        public string PodName { get; set; }
         public int PodTypeId { get; set; }
         public string PodTypeName { get; set; }
     }

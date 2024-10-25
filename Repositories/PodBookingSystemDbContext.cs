@@ -52,6 +52,7 @@ namespace Repositories
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<BookingStatus> BookingsStatuses { get; set; }
         public virtual DbSet<UserOtp> UserOtps { get; set; }
+        public virtual DbSet<StaffArea> StaffAreas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -142,6 +143,16 @@ namespace Repositories
                 .HasOne(u => u.User)
                 .WithMany(r => r.UserOtps)
                 .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.StaffArea)
+                .WithOne(r => r.Staff)
+                .HasForeignKey<StaffArea>(r => r.StaffId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<StaffArea>()
+                .HasOne(u => u.Area)
+                .WithMany(r => r.StaffAreas)
+                .HasForeignKey(u => u.AreaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BookingStatus>().HasData(

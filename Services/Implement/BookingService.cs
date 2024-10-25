@@ -1,5 +1,6 @@
 using Models;
 using Models.DTOs;
+using Repositories.Implement;
 using Repositories.Interface;
 using Services.Interface;
 using System;
@@ -23,6 +24,7 @@ namespace Services.Implement
         private readonly IRepositoryBase<Slot> _slotRepo;
         private readonly IRepositoryBase<User> _userRepo;
         private readonly IRepositoryBase<Membership> _membershipRepo;
+        private readonly IRepositoryBase<Area> _areaRepo;
 
         public BookingService(IRepositoryBase<Booking> bookingRepo,
                               IRepositoryBase<BookingStatus> bookingStatusRepo,
@@ -32,7 +34,8 @@ namespace Services.Implement
                               IRepositoryBase<Schedule> scheduleRepo,
                               IRepositoryBase<Slot> slotRepo,
                               IRepositoryBase<User> userRepo,
-                              IRepositoryBase<Membership> membershipRepo)
+                              IRepositoryBase<Membership> membershipRepo,
+                              IRepositoryBase<Area> areaRepo)
         {
             _bookingRepo = bookingRepo;
             _bookingStatusRepo = bookingStatusRepo;
@@ -43,6 +46,7 @@ namespace Services.Implement
             _slotRepo = slotRepo;
             _userRepo = userRepo;
             _membershipRepo = membershipRepo;
+            _areaRepo = areaRepo;
         }
 
         public async Task<GetBookingResponse> GetAllBookings()
@@ -75,6 +79,8 @@ namespace Services.Implement
                 var arrivalDate = DateOnly.MinValue;
                 var startTime = TimeOnly.MaxValue;
                 var endTime = TimeOnly.MinValue;
+                var podId = 0;
+                var podName = "";
                 var podTypeId = 0;
                 var podType = new PodType();
 
@@ -116,6 +122,8 @@ namespace Services.Implement
                         return new GetBookingResponse { Message = "Pod is null." };
                     }
 
+                    podId = pod.Id;
+                    podName = pod.Name;
                     podTypeId = pod.PodTypeId;
                     podType = await _podTypeRepo.FindByIdAsync(podTypeId);
 
@@ -132,6 +140,8 @@ namespace Services.Implement
                     StartTime = startTime,
                     EndTime = endTime,
                     StatusId = booking.BookingStatusId,
+                    PodId = podId,
+                    PodName = podName,
                     PodTypeId = podTypeId,
                     PodTypeName = podType.Name,
                 };
@@ -174,6 +184,8 @@ namespace Services.Implement
                 var arrivalDate = DateOnly.MinValue;
                 var startTime = TimeOnly.MaxValue;
                 var endTime = TimeOnly.MinValue;
+                var podId = 0;
+                var podName = "";
                 var podTypeId = 0;
                 var podType = new PodType();
 
@@ -215,6 +227,8 @@ namespace Services.Implement
                         return new GetBookingResponse { Message = "Pod is null." };
                     }
 
+                    podId = pod.Id;
+                    podName = pod.Name;
                     podTypeId = pod.PodTypeId;
                     podType = await _podTypeRepo.FindByIdAsync(podTypeId);
 
@@ -231,6 +245,8 @@ namespace Services.Implement
                     StartTime = startTime,
                     EndTime = endTime,
                     StatusId = booking.BookingStatusId,
+                    PodId = podId,
+                    PodName = podName,
                     PodTypeId = podTypeId,
                     PodTypeName = podType.Name,
                 };
@@ -321,6 +337,26 @@ namespace Services.Implement
             catch (Exception ex)
             {
                 return new CancelBookingResponse { Success = false, Message = "Unable to cancel the Booking with Id: " + id };
+            }
+
+            var details = await _bookingDetailRepo.GetAllAsync();
+
+            var bookingDetails = details.Where(bd => bd.BookingId == booking.Id);
+
+            foreach (var detail in bookingDetails)
+            {
+                var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                slot.Status = 0;
+
+                try
+                {
+                    await _slotRepo.UpdateAsync(slot);
+                }
+                catch (Exception ex)
+                {
+                    return new CancelBookingResponse { Success = false, Message = "Unable to update the slot status." };
+                }
             }
 
             booking.BookingStatus = await _bookingStatusRepo.FindByIdAsync(1);
@@ -669,6 +705,105 @@ namespace Services.Implement
             }
 
             return new FinishBookingResponse { Success = true, Booking = booking };
+        }
+        public async Task<List<BookingOverviewDto>> GetBookingsByAreaIdAsync(int areaId)
+        {
+            var area = await _areaRepo.FindByIdAsync(areaId);
+            if (area == null)
+            {
+                throw new Exception($"Area with ID {areaId} was not found.");
+            }
+
+            var podsInArea = await _podRepo.GetAllAsync();
+            var filteredPods = podsInArea.Where(p => p.AreaId == areaId).ToList();
+            if (!filteredPods.Any())
+            {
+                throw new Exception($"No Pods found for Area ID {areaId}.");
+            }
+
+            var podIds = filteredPods.Select(p => p.Id).ToList();
+            var slotsInPods = await _slotRepo.GetAllAsync();
+            var filteredSlots = slotsInPods.Where(s => s.PodId.HasValue && podIds.Contains(s.PodId.Value)).ToList();
+            if (!filteredSlots.Any())
+            {
+                throw new KeyNotFoundException($"No Slots found for Pods in Area ID {areaId}.");
+            }
+
+            var slotIds = filteredSlots.Select(s => s.Id).ToList();
+            var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+            var filteredBookingDetails = bookingDetails.Where(bd => slotIds.Contains(bd.SlotId)).ToList();
+            if (!filteredBookingDetails.Any())
+            {
+                throw new KeyNotFoundException($"No BookingDetails found for Slots in Area ID {areaId}.");
+            }
+
+            var bookingIds = filteredBookingDetails.Select(bd => bd.BookingId).Distinct().ToList();
+            var allBookings = await _bookingRepo.GetAllAsync();
+            var bookings = allBookings.Where(b => bookingIds.Contains(b.Id)).ToList();
+            if (!bookings.Any())
+            {
+                throw new KeyNotFoundException($"No Bookings found for Area ID {areaId}.");
+            }
+
+            var bookingOverviews = new List<BookingOverviewDto>();
+            foreach (var booking in bookings)
+            {
+                var arrivalDate = DateOnly.MinValue;
+                var startTime = TimeOnly.MaxValue;
+                var endTime = TimeOnly.MinValue;
+                int podTypeId = 0;
+                string podTypeName = string.Empty;
+
+                var userDetails = filteredBookingDetails.Where(d => d.BookingId == booking.Id).ToList();
+
+                foreach (var detail in userDetails)
+                {
+                    var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+                    if (slot != null)
+                    {
+                        arrivalDate = slot.ArrivalDate;
+
+                        var schedule = await _scheduleRepo.FindByIdAsync(slot.ScheduleId.Value);
+                        if (schedule != null)
+                        {
+                            if (schedule.StartTime < startTime)
+                            {
+                                startTime = schedule.StartTime;
+                            }
+
+                            if (schedule.EndTime > endTime)
+                            {
+                                endTime = schedule.EndTime;
+                            }
+
+                            var pod = await _podRepo.FindByIdAsync(slot.PodId.Value);
+                            if (pod != null)
+                            {
+                                podTypeId = pod.PodTypeId;
+                                var podType = await _podTypeRepo.FindByIdAsync(podTypeId);
+                                if (podType != null)
+                                {
+                                    podTypeName = podType.Name;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var bookingOverview = new BookingOverviewDto
+                {
+                    BookingId = booking.Id,
+                    ArrivalDate = arrivalDate,
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    StatusId = booking.BookingStatusId,
+                    PodTypeId = podTypeId,
+                    PodTypeName = podTypeName,
+                };
+
+                bookingOverviews.Add(bookingOverview);
+            }
+            return bookingOverviews;
         }
     }
 }
