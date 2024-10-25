@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IdentityModel.Tokens;
+using Models;
 using Models.DTOs;
 using Services.Interface;
 using System.Diagnostics;
@@ -213,5 +214,20 @@ namespace PodBookingSystem.API.Controllers
                 return BadRequest(response.Message);
             }
         }
+
+        [HttpGet("areaid/{id}")]
+        public async Task<IActionResult> GetBookingByAreaID(int id)
+        {
+            try
+            {
+                var bookings = await _bookingService.GetBookingsByAreaIdAsync(id);
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }
