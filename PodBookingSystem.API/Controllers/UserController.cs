@@ -96,7 +96,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "3, 4")]
+        //[Authorize(Roles = "1, 2, 3, 4")]
         public async Task<IActionResult> Delete(int id)
         {
             try
