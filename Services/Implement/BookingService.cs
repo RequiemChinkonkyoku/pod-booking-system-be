@@ -335,6 +335,26 @@ namespace Services.Implement
                 return new CancelBookingResponse { Success = false, Message = "Unable to cancel the Booking with Id: " + id };
             }
 
+            var details = await _bookingDetailRepo.GetAllAsync();
+
+            var bookingDetails = details.Where(bd => bd.BookingId == booking.Id);
+
+            foreach (var detail in bookingDetails)
+            {
+                var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
+
+                slot.Status = 0;
+
+                try
+                {
+                    await _slotRepo.UpdateAsync(slot);
+                }
+                catch (Exception ex)
+                {
+                    return new CancelBookingResponse { Success = false, Message = "Unable to update the slot status." };
+                }
+            }
+
             booking.BookingStatus = await _bookingStatusRepo.FindByIdAsync(1);
 
             return new CancelBookingResponse { Success = true, Booking = booking };
