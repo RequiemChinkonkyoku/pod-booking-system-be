@@ -75,6 +75,8 @@ namespace Services.Implement
                 var arrivalDate = DateOnly.MinValue;
                 var startTime = TimeOnly.MaxValue;
                 var endTime = TimeOnly.MinValue;
+                var podId = 0;
+                var podName = "";
                 var podTypeId = 0;
                 var podType = new PodType();
 
@@ -116,6 +118,8 @@ namespace Services.Implement
                         return new GetBookingResponse { Message = "Pod is null." };
                     }
 
+                    podId = pod.Id;
+                    podName = pod.Name;
                     podTypeId = pod.PodTypeId;
                     podType = await _podTypeRepo.FindByIdAsync(podTypeId);
 
@@ -132,6 +136,8 @@ namespace Services.Implement
                     StartTime = startTime,
                     EndTime = endTime,
                     StatusId = booking.BookingStatusId,
+                    PodId = podId,
+                    PodName = podName,
                     PodTypeId = podTypeId,
                     PodTypeName = podType.Name,
                 };
@@ -174,6 +180,8 @@ namespace Services.Implement
                 var arrivalDate = DateOnly.MinValue;
                 var startTime = TimeOnly.MaxValue;
                 var endTime = TimeOnly.MinValue;
+                var podId = 0;
+                var podName = "";
                 var podTypeId = 0;
                 var podType = new PodType();
 
@@ -215,6 +223,8 @@ namespace Services.Implement
                         return new GetBookingResponse { Message = "Pod is null." };
                     }
 
+                    podId = pod.Id;
+                    podName = pod.Name;
                     podTypeId = pod.PodTypeId;
                     podType = await _podTypeRepo.FindByIdAsync(podTypeId);
 
@@ -231,6 +241,8 @@ namespace Services.Implement
                     StartTime = startTime,
                     EndTime = endTime,
                     StatusId = booking.BookingStatusId,
+                    PodId = podId,
+                    PodName = podName,
                     PodTypeId = podTypeId,
                     PodTypeName = podType.Name,
                 };
