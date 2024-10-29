@@ -197,5 +197,66 @@ namespace Services.Implement
             await _userRepo.UpdateAsync(user);
             return true;
         }
+
+        public async Task<bool> UserUpdateNameAsync(int id, string name)
+        {
+            bool result = false;
+            var user = await GetUserByIdAsync(id);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found.");
+            }
+
+            // Validate Name
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Name cannot be empty.");
+                //return result;
+            }
+
+            user.Name = name;
+            await _userRepo.UpdateAsync(user);
+            result = true;
+            return result;
+        }
+
+        public async Task<bool> UserUpdatePassword(int id, string currentPassword, string newPassword)
+        {
+            bool result = false;
+            var user = await GetUserByIdAsync(id);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found.");
+            }
+            if (user.Status != 1)
+            {
+                throw new ArgumentException("User is not active!");
+            }
+            if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+            {
+                throw new ArgumentException("Current password is not correct.");
+            }
+
+            // Validate Password
+            if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword))
+            {
+                throw new ArgumentException("Password cannot be empty.");
+            }
+            if (BCrypt.Net.BCrypt.Verify(newPassword, user.PasswordHash))
+            {
+                throw new ArgumentException("Current password and new password must not be the same.");
+            }
+            if (!IsPasswordValid(newPassword))
+            {
+                throw new ArgumentException("Password must be at least 8 characters long, contain at least 1 capital letter, 1 normal letter, 1 special character, and 1 number.");
+            }
+
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            user.Password = newPassword;
+            user.PasswordHash = passwordHash;
+            await _userRepo.UpdateAsync(user);
+            result = true;
+            return result;
+        }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTOs;
 using Services.Interface;
+using System.Security.Claims;
 
 namespace PodBookingSystem.API.Controllers
 {
@@ -95,7 +96,7 @@ namespace PodBookingSystem.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "3, 4")]
+        //[Authorize(Roles = "1, 2, 3, 4")]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -117,6 +118,66 @@ namespace PodBookingSystem.API.Controllers
 
             // Fallback
             return StatusCode(500, "An unexpected error occurred.");
+        }
+
+        [HttpGet("Current")]
+        [Authorize(Roles = "1, 2, 3, 4")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            int id = -1;
+            try
+            {
+                id = Int32.Parse(User.FindFirst(ClaimTypes.Name)?.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
+        [HttpPut("{id}/Name")]
+        //[Authorize(Roles = "1, 2, 3, 4")]
+        public async Task<IActionResult> UserUpdateName(int id, string name)
+        {
+            try
+            {
+                var response = await _userService.UserUpdateNameAsync(id, name);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. " + ex.Message);
+            }
+        }
+
+        [HttpPut("{id}/Password")]
+        //[Authorize(Roles = "1, 2, 3, 4")]
+        public async Task<IActionResult> UserUpdatePassword(int id, string currentPassword, string newPassword)
+        {
+            try
+            {
+                var response = await _userService.UserUpdatePassword(id, currentPassword, newPassword);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. " + ex.Message);
+            }
         }
     }
 }
