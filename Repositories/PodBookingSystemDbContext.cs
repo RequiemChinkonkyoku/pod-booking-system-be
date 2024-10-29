@@ -74,6 +74,11 @@ namespace Repositories
                 .WithMany(r => r.Bookings)
                 .HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Membership)
+                .WithMany(m => m.Bookings)
+                .HasForeignKey(b => b.MembershipId)
+                .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<SelectedProduct>()
                 .HasOne(u => u.Product)
                 .WithMany(r => r.SelectedProducts)
