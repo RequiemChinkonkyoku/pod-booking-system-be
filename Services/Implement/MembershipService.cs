@@ -42,6 +42,25 @@ namespace Services.Implement
             return new MembershipServiceResponse { Success = true, Membership = membership };
         }
 
+        public async Task<MembershipServiceResponse> GetCustomerMembership(int id)
+        {
+            var user = await _userRepo.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return new MembershipServiceResponse { Success = false, Message = "Unable to find user." };
+            }
+
+            var membership = await _memberRepo.FindByIdAsync(user.MembershipId.Value);
+
+            if (membership == null)
+            {
+                return new MembershipServiceResponse { Success = false, Message = "Unable to find membership." };
+            }
+
+            return new MembershipServiceResponse { Success = true, Membership = membership };
+        }
+
         public async Task<MembershipServiceResponse> CreateMembership(CreateMembershipRequest request)
         {
             if (request.Name.IsNullOrEmpty() || request.Description.IsNullOrEmpty())
