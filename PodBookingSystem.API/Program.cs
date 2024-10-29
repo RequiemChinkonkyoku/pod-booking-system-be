@@ -36,6 +36,7 @@ builder.Services.AddScoped<IRepositoryBase<Models.Transaction>, TransactionRepos
 builder.Services.AddScoped<IRepositoryBase<User>, UserRepository>();
 builder.Services.AddScoped<IRepositoryBase<UserOtp>, UserOtpRepository>();
 builder.Services.AddScoped<IRepositoryBase<Method>, MethodRepository>();
+builder.Services.AddScoped<IRepositoryBase<StaffArea>, StaffAreaRepository>();
 
 builder.Services.AddScoped<IAreaService, AreaService>();
 builder.Services.AddScoped<IBookingDetailService, BookingDetailService>();
@@ -55,6 +56,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMethodService, MethodService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IStaffAreaService, StaffAreaService>();
 
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
