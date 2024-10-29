@@ -49,7 +49,7 @@ namespace Services.Implement
                 return new MembershipServiceResponse { Success = false, Message = "All fields must be given." };
             }
 
-            var membership = new Membership { Name = request.Name.Trim(), Description = request.Description.Trim(), Status = 1 };
+            var membership = new Membership { Name = request.Name.Trim(), Description = request.Description.Trim(), Status = 1, Discount = request.Discount };
 
             try
             {
