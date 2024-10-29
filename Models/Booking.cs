@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace Models
 {
@@ -15,6 +16,12 @@ namespace Models
         public int Id { get; set; }
         public int BookingPrice { get; set; }
         public DateTime CreatedTime { get; set; }
+
+        public int? MembershipId { get; set; }
+        public Membership Membership { get; set; }
+
+        public int Discount { get; set; }
+        public int ActualPrice { get; set; }
 
         public int BookingStatusId { get; set; }
         public BookingStatus BookingStatus { get; set; }

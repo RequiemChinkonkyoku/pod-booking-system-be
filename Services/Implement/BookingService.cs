@@ -376,6 +376,9 @@ namespace Services.Implement
 
             var user = await _userRepo.FindByIdAsync(userId);
 
+            var membership = await _membershipRepo.FindByIdAsync(user.MembershipId.Value);
+            var discount = membership.Discount;
+
             int dayDiff = ((request.ArrivalDate).ToDateTime(TimeOnly.MinValue) - DateTime.UtcNow).Days;
 
             if (user.MembershipId == 2 && dayDiff < 7)
@@ -383,7 +386,7 @@ namespace Services.Implement
                 return new CreateBookingResponse { Success = false, Message = "The arrival date must be at least 7 days from now." };
             }
 
-            if (user.MembershipId == 3 && dayDiff < 3)
+            if (user.MembershipId > 2 && dayDiff < 3)
             {
                 return new CreateBookingResponse { Success = false, Message = "The arrival date must be at least 3 days from now." };
             }
@@ -438,7 +441,10 @@ namespace Services.Implement
                 BookingPrice = podPrice,
                 CreatedTime = DateTime.UtcNow,
                 BookingStatusId = 2,
-                UserId = userId
+                UserId = userId,
+                MembershipId = membership.Id,
+                Discount = discount,
+                ActualPrice = (podPrice * discount) / 100,
             };
 
             try

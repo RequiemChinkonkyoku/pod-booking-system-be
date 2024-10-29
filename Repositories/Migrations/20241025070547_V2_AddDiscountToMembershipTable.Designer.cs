@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(PodBookingSystemDbContext))]
-    partial class PodBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241025070547_V2_AddDiscountToMembershipTable")]
+    partial class V2_AddDiscountToMembershipTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,9 +66,6 @@ namespace Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ActualPrice")
-                        .HasColumnType("int");
-
                     b.Property<int>("BookingPrice")
                         .HasColumnType("int");
 
@@ -75,20 +75,12 @@ namespace Repositories.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Discount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MembershipId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookingStatusId");
-
-                    b.HasIndex("MembershipId");
 
                     b.HasIndex("UserId");
 
@@ -98,21 +90,17 @@ namespace Repositories.Migrations
                         new
                         {
                             Id = 1,
-                            ActualPrice = 0,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 10, 25, 14, 34, 2, 28, DateTimeKind.Local).AddTicks(7723),
-                            Discount = 0,
+                            CreatedTime = new DateTime(2024, 10, 25, 14, 5, 46, 484, DateTimeKind.Local).AddTicks(5538),
                             UserId = 1
                         },
                         new
                         {
                             Id = 2,
-                            ActualPrice = 0,
                             BookingPrice = 10000,
                             BookingStatusId = 5,
-                            CreatedTime = new DateTime(2024, 10, 25, 14, 34, 2, 28, DateTimeKind.Local).AddTicks(7740),
-                            Discount = 0,
+                            CreatedTime = new DateTime(2024, 10, 25, 14, 5, 46, 484, DateTimeKind.Local).AddTicks(5550),
                             UserId = 2
                         });
                 });
@@ -714,7 +702,7 @@ namespace Repositories.Migrations
                             MembershipId = 2,
                             Name = "CUSTOMER",
                             Password = "Customer@1234",
-                            PasswordHash = "$2a$11$qIMhjWkgYBS4qzCDIIGt2OAp63Osl8orKTLEvdbv1mtj10RvIhCzO",
+                            PasswordHash = "$2a$11$8akfpwahrqFCHBHZOHGhJ.s/7E4Qx40hZN5ghvJLQ81WmtGXxdXvO",
                             RoleId = 1,
                             Status = 1
                         },
@@ -725,7 +713,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "STAFF",
                             Password = "Staff@1234",
-                            PasswordHash = "$2a$11$EjpwSTEUxeLmBwQwCH5leejZ.P3CxJBVh4zuK/ySUWj/Hh2m8NKjC",
+                            PasswordHash = "$2a$11$dzD6fqEn3q4./1UL1zGV7.vmc0r8LscKDtEJLH0xPqeVpIMhQJL52",
                             RoleId = 2,
                             Status = 1
                         },
@@ -736,7 +724,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "MANAGER",
                             Password = "Manager@1234",
-                            PasswordHash = "$2a$11$m5sHnsQp1x99QOzkmdDb.eGUfma65NAl2na5UITFzDPy2U7lTzZnC",
+                            PasswordHash = "$2a$11$04shj6r/aL5r6LWmArU6De6Nl8WWEbWIwTxIBJcDC9uLr3uL9iEEy",
                             RoleId = 3,
                             Status = 1
                         },
@@ -747,7 +735,7 @@ namespace Repositories.Migrations
                             MembershipId = 1,
                             Name = "ADMIN",
                             Password = "Admin@1234",
-                            PasswordHash = "$2a$11$ChOcxEpk7AO7VwYmxkDSrOJG8K.ENzKc6DYynm8dcpa5bLGV7U6/.",
+                            PasswordHash = "$2a$11$dibKWEwL6y2hDeQdC7tDKuVmAoWkJZZeJ1yD2Y492tU3lX8AwGUL.",
                             RoleId = 4,
                             Status = 1
                         });
@@ -789,11 +777,6 @@ namespace Repositories.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Models.Membership", "Membership")
-                        .WithMany("Bookings")
-                        .HasForeignKey("MembershipId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Models.User", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId")
@@ -801,8 +784,6 @@ namespace Repositories.Migrations
                         .IsRequired();
 
                     b.Navigation("BookingStatus");
-
-                    b.Navigation("Membership");
 
                     b.Navigation("User");
                 });
@@ -1005,8 +986,6 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("Models.Membership", b =>
                 {
-                    b.Navigation("Bookings");
-
                     b.Navigation("Users");
                 });
 
