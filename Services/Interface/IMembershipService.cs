@@ -12,6 +12,7 @@ namespace Services.Interface
     {
         public Task<List<Membership>> ViewAllMembership();
         public Task<MembershipServiceResponse> GetMembershipById(int id);
+        public Task<MembershipServiceResponse> GetCustomerMembership(int id);
         public Task<MembershipServiceResponse> CreateMembership(CreateMembershipRequest request);
         public Task<MembershipServiceResponse> UpdateMembership(int id, UpdateMembershipRequest request);
         public Task<MembershipServiceResponse> ToggleMembership(int id);
