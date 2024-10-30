@@ -337,6 +337,14 @@ namespace Services.Implement
 
             var user = await _userRepo.FindByIdAsync(userId);
 
+            var bookings = await _bookingRepo.GetAllAsync();
+            var ongoingBooking = bookings.FirstOrDefault(b => b.UserId == userId && (b.BookingStatusId != 1 || b.BookingStatusId != 5));
+
+            if (ongoingBooking != null)
+            {
+                return new CreateBookingResponse { Success = false, Message = "There can only be one booking at a time." };
+            }
+
             var membership = await _membershipRepo.FindByIdAsync(user.MembershipId.Value);
             var discount = membership.Discount;
 
