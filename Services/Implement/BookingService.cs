@@ -395,17 +395,17 @@ namespace Services.Implement
                 }
             }
 
-            var podPrice = (_podTypeRepo.FindByIdAsync(pod.PodTypeId).Result.Price) * request.ScheduleIds.Count;
+            var bookingPrice = (_podTypeRepo.FindByIdAsync(pod.PodTypeId).Result.Price) * request.ScheduleIds.Count;
 
             var booking = new Booking
             {
-                BookingPrice = podPrice,
+                BookingPrice = bookingPrice,
                 CreatedTime = DateTime.UtcNow,
                 BookingStatusId = 2,
                 UserId = userId,
                 MembershipId = membership.Id,
                 Discount = discount,
-                ActualPrice = (podPrice * discount) / 100,
+                ActualPrice = bookingPrice * ((1 - discount) / 100)
             };
 
             try
