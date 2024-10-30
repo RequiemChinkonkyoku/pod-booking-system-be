@@ -43,8 +43,8 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpGet("customer/{id}")]
-        public async Task<IActionResult> GetCustomerMembership([FromRoute] int id)
+        [HttpGet("customer")]
+        public async Task<IActionResult> GetCustomerMembership()
         {
             int userId = 0;
 
@@ -57,7 +57,7 @@ namespace PodBookingSystem.API.Controllers
                 return Unauthorized("You must login to perform this task.");
             }
 
-            var response = await _memberService.GetCustomerMembership(id);
+            var response = await _memberService.GetCustomerMembership(userId);
 
             if (response.Success)
             {
