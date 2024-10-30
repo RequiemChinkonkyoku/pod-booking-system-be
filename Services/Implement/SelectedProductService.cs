@@ -53,19 +53,29 @@ namespace Services.Implement
                 throw new Exception("Product does not exist");
             }
 
-            var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
+            var existingSelectedProduct = (await _selectedProductRepo.GetAllAsync())
+        .FirstOrDefault(sp => sp.ProductId == selectedProductDto.ProductId && sp.BookingId == selectedProductDto.BookingId);
 
-            var selectedProduct = new SelectedProduct
+            if (existingSelectedProduct != null)
             {
-                Quantity = selectedProductDto.Quantity,
-                ProductPrice = product.Price,
-                ProductId = selectedProductDto.ProductId,
-                BookingId = selectedProductDto.BookingId,   
-            };
+                existingSelectedProduct.Quantity += selectedProductDto.Quantity;
+                await _selectedProductRepo.UpdateAsync(existingSelectedProduct);
+                return existingSelectedProduct;
+            }
+            else
+            {
+                var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
+                var selectedProduct = new SelectedProduct
+                {
+                    Quantity = selectedProductDto.Quantity,
+                    ProductPrice = product.Price,
+                    ProductId = selectedProductDto.ProductId,
+                    BookingId = selectedProductDto.BookingId,
+                };
 
-            await _selectedProductRepo.AddAsync(selectedProduct);
-
-            return  selectedProduct;
+                await _selectedProductRepo.AddAsync(selectedProduct);
+                return selectedProduct;
+            }
         }
 
         public async Task<SelectedProduct> UpdateSelectedProductAsync(int id, UpdateSelectedProductDto selectedProductDto)
