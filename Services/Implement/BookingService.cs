@@ -337,6 +337,14 @@ namespace Services.Implement
 
             var user = await _userRepo.FindByIdAsync(userId);
 
+            var bookings = await _bookingRepo.GetAllAsync();
+            var ongoingBooking = bookings.FirstOrDefault(b => b.UserId == userId && b.BookingStatusId != 1 && b.BookingStatusId != 5);
+
+            if (ongoingBooking != null)
+            {
+                return new CreateBookingResponse { Success = false, Message = "There can only be one booking at a time." };
+            }
+
             var membership = await _membershipRepo.FindByIdAsync(user.MembershipId.Value);
             var discount = membership.Discount;
 
@@ -395,17 +403,18 @@ namespace Services.Implement
                 }
             }
 
-            var podPrice = (_podTypeRepo.FindByIdAsync(pod.PodTypeId).Result.Price) * request.ScheduleIds.Count;
+            var bookingPrice = (_podTypeRepo.FindByIdAsync(pod.PodTypeId).Result.Price) * request.ScheduleIds.Count;
+            var actualPrice = bookingPrice * (1 - (discount / 100.00));
 
             var booking = new Booking
             {
-                BookingPrice = podPrice,
+                BookingPrice = bookingPrice,
                 CreatedTime = DateTime.UtcNow,
                 BookingStatusId = 2,
                 UserId = userId,
                 MembershipId = membership.Id,
                 Discount = discount,
-                ActualPrice = (podPrice * discount) / 100,
+                ActualPrice = (int) actualPrice
             };
 
             try
