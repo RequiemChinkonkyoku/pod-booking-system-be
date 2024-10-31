@@ -1,9 +1,12 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Options;
+using Models;
 using Models.DTOs;
 using Newtonsoft.Json;
+using Repositories.Interface;
 using Services.Interface;
 using System;
 using System.Collections.Generic;
@@ -18,12 +21,16 @@ namespace Services.Implement
     {
         private readonly IOptions<MomoOptionModel> _options;
         private readonly HttpClient _client;
+        private readonly IRepositoryBase<Booking> _bookingRepo;
+        private readonly IRepositoryBase<Transaction> _transRepo;
 
-        public MomoService(IOptions<MomoOptionModel> options)
+        public MomoService(IOptions<MomoOptionModel> options, IRepositoryBase<Booking> bookingRepo, IRepositoryBase<Transaction> transRepo)
         {
             _options = options;
             _client = new HttpClient();
             _client.BaseAddress = new Uri(_options.Value.MomoApiUrl);
+            _bookingRepo = bookingRepo;
+            _transRepo = transRepo;
         }
 
         public async Task<CreatePaymentResponse> CreatePaymentAsync(CreatePaymentRequest request)
@@ -85,20 +92,69 @@ namespace Services.Implement
             return hashString;
         }
 
-        public MomoExecuteResponse PaymentExecute(IQueryCollection collection)
+        public async Task<MomoExecuteResponse> PaymentExecute(IQueryCollection collection)
         {
             var amount = collection.First(s => s.Key == "amount").Value;
             var orderInfo = collection.First(s => s.Key == "orderInfo").Value;
             var orderId = collection.First(s => s.Key == "orderId").Value;
+            var transId = collection.First(s => s.Key == "transId").Value;
             var errorCode = collection.First(s => s.Key == "errorCode").Value;
+            var localMessage = collection.First(s => s.Key == "localMessage").Value;
+            var bookingId = orderInfo.ToString().Split("BookingID: ")[1];
 
-            return new MomoExecuteResponse()
+            if (errorCode.Equals("0"))
             {
-                Amount = amount,
+                var booking = await _bookingRepo.FindByIdAsync(Int32.Parse(bookingId));
+
+                if (booking == null)
+                {
+                    return new MomoExecuteResponse { Success = false, Message = "Unable to find booking with id " + bookingId };
+                }
+
+                booking.BookingStatusId = 3;
+
+                try
+                {
+                    await _bookingRepo.UpdateAsync(booking);
+                }
+                catch (Exception ex)
+                {
+                    return new MomoExecuteResponse { Success = false, Message = "Unable to update booking status" };
+                }
+            }
+
+            var trans = new Transaction
+            {
+                PaymentTime = DateTime.UtcNow,
+                TotalPrice = Int32.Parse(amount),
+                MethodId = 1,
+                BookingId = Int32.Parse(bookingId),
                 OrderId = orderId,
-                OrderInfo = orderInfo,
-                ErrorCode = errorCode
+                PaymentId = transId,
+                Status = (errorCode.Equals("0") ? 1 : 0)
             };
+
+            try
+            {
+                await _transRepo.AddAsync(trans);
+            }
+            catch (Exception e)
+            {
+                return new MomoExecuteResponse { Success = false, Message = "There has been an error creating transaction." };
+            }
+
+            var response = new MomoExecuteResponse
+            {
+                Success = (errorCode.Equals("0") ? true : false),
+                Message = localMessage,
+                ErrorCode = errorCode,
+                BookingId = Int32.Parse(bookingId),
+                OrderId = orderId,
+                Amount = Int32.Parse(amount),
+                OrderInfo = orderInfo,
+            };
+
+            return response;
         }
     }
 }

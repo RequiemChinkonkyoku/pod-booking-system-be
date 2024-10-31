@@ -47,25 +47,42 @@ namespace Services.Implement
                 throw new Exception("Booking does not exist");
             }
 
-            var allProduct = await _productRepo.GetAllAsync();
-            if (!allProduct.Any(c => c.Id == selectedProductDto.ProductId))
+            var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
+            if (product == null)
             {
                 throw new Exception("Product does not exist");
             }
-
-            var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
-
-            var selectedProduct = new SelectedProduct
+            if (product.Quantity < selectedProductDto.Quantity)
             {
-                Quantity = selectedProductDto.Quantity,
-                ProductPrice = product.Price,
-                ProductId = selectedProductDto.ProductId,
-                BookingId = selectedProductDto.BookingId,   
-            };
+                throw new Exception("Insufficient product stock");
+            }
 
-            await _selectedProductRepo.AddAsync(selectedProduct);
+            var existingSelectedProduct = (await _selectedProductRepo.GetAllAsync())
+                .FirstOrDefault(sp => sp.ProductId == selectedProductDto.ProductId && sp.BookingId == selectedProductDto.BookingId);
 
-            return  selectedProduct;
+            if (existingSelectedProduct != null)
+            {
+                existingSelectedProduct.Quantity += selectedProductDto.Quantity;
+                await _selectedProductRepo.UpdateAsync(existingSelectedProduct);
+            }
+            else
+            {
+                var selectedProduct = new SelectedProduct
+                {
+                    Quantity = selectedProductDto.Quantity,
+                    ProductPrice = product.Price,
+                    ProductId = selectedProductDto.ProductId,
+                    BookingId = selectedProductDto.BookingId,
+                };
+
+                await _selectedProductRepo.AddAsync(selectedProduct);
+                existingSelectedProduct = selectedProduct;
+            }
+
+            product.Quantity -= selectedProductDto.Quantity;
+            await _productRepo.UpdateAsync(product);
+
+            return existingSelectedProduct;
         }
 
         public async Task<SelectedProduct> UpdateSelectedProductAsync(int id, UpdateSelectedProductDto selectedProductDto)
@@ -97,13 +114,17 @@ namespace Services.Implement
         public async Task<bool> DeleteSelectedProductAsync(int id)
         {
             bool result = false;
-            var product = await _selectedProductRepo.FindByIdAsync(id);
-            
-            if (product != null)
+            var selectedProduct = await _selectedProductRepo.FindByIdAsync(id);
+            var product = await _productRepo.FindByIdAsync(selectedProduct.ProductId);
+
+            if (selectedProduct != null)
             {
-                await _selectedProductRepo.DeleteAsync(product);
+                product.Quantity += selectedProduct.Quantity;
+                await _productRepo.UpdateAsync(product);
+                await _selectedProductRepo.DeleteAsync(selectedProduct);
                 result = true;
             }
+
 
             return result;
         }

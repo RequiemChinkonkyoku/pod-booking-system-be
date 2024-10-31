@@ -11,6 +11,6 @@ namespace Services.Interface
     public interface IMomoService
     {
         public Task<CreatePaymentResponse> CreatePaymentAsync(CreatePaymentRequest model);
-        public MomoExecuteResponse PaymentExecute(IQueryCollection collection);
+        public Task<MomoExecuteResponse> PaymentExecute(IQueryCollection collection);
     }
 }

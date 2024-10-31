@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using Models.DTOs;
 using Repositories.Implement;
 using Services.Implement;
@@ -12,13 +13,11 @@ namespace PodBookingSystem.API.Controllers
     {
         private readonly IMomoService _momoService;
         private readonly IBookingService _bookingService;
-        private readonly ITransactionService _transactionService;
 
-        public MomoController(IMomoService momoService, IBookingService bookingService, ITransactionService transactionService)
+        public MomoController(IMomoService momoService, IBookingService bookingService)
         {
             _momoService = momoService;
             _bookingService = bookingService;
-            _transactionService = transactionService;
         }
 
         [HttpPost("create-payment")]
@@ -32,7 +31,7 @@ namespace PodBookingSystem.API.Controllers
             }
 
             request.FullName = getResponse.Booking.User.Name;
-            request.Amount = getResponse.Booking.BookingPrice;
+            //request.Amount = getResponse.Booking.BookingPrice;
 
             var response = await _momoService.CreatePaymentAsync(request);
 
@@ -46,27 +45,26 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpPost("payment-execute/{id}")]
-        public async Task<IActionResult> PaymentExecuteAsync(int id)
+        [HttpPost("payment-execute")]
+        public async Task<IActionResult> PaymentExecute()
         {
-            if (id == null)
+            var query = HttpContext.Request.Query;
+
+            if (query == null)
             {
                 return BadRequest("There has been an error during the payment process");
             }
 
-            var updateResponse = await _bookingService.UpdateBookingStatus(id);
+            var response = await _momoService.PaymentExecute(query);
 
-            _transactionService.CreateTransaction(id, updateResponse.Success);
-
-            if (updateResponse.Success)
+            if (response.Success)
             {
-                return Ok(updateResponse);
+                return Ok(response);
             }
             else
             {
-                return BadRequest(updateResponse.Message);
+                return BadRequest(response.Message);
             }
-
         }
     }
 }

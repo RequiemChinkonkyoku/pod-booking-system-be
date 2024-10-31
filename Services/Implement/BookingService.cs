@@ -51,28 +51,10 @@ namespace Services.Implement
 
         public async Task<GetBookingResponse> GetAllBookings()
         {
-            //var bookingList = await _bookingRepo.GetAllAsync();
-            //var bookingOverviews = new List<BookingOverviewDto>();
-
-            //foreach (var booking in bookingList)
-            //{
-            //    var user = await _userRepo.FindByIdAsync(booking.UserId);
-            //    booking.User = user;
-
-            //    var bookingDetails = await _bookingDetailRepo.GetAllAsync();
-            //    var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
-            //    booking.BookingDetails = userDetails;
-
-            //    foreach (var detail in userDetails)
-            //    {
-            //        var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
-
-            //        detail.Slot = slot;
-            //    }
-            //}
-
             var bookingList = await _bookingRepo.GetAllAsync();
             var bookingOverviews = new List<BookingOverviewDto>();
+
+            var bookingDetails = await _bookingDetailRepo.GetAllAsync();
 
             foreach (var booking in bookingList)
             {
@@ -84,7 +66,6 @@ namespace Services.Implement
                 var podTypeId = 0;
                 var podType = new PodType();
 
-                var bookingDetails = await _bookingDetailRepo.GetAllAsync();
                 var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
 
                 foreach (var detail in userDetails)
@@ -154,32 +135,13 @@ namespace Services.Implement
 
         public async Task<GetBookingResponse> GetUserBookings(int id)
         {
-            //var bookingList = await _bookingRepo.GetAllAsync();
-
-            //var userBookings = bookingList.Where(b => b.UserId == id).ToList();
-
-            //foreach (var booking in userBookings)
-            //{
-            //    var user = await _userRepo.FindByIdAsync(booking.UserId);
-            //    booking.User = user;
-
-            //    var bookingDetails = await _bookingDetailRepo.GetAllAsync();
-            //    var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
-            //    booking.BookingDetails = userDetails;
-
-            //    foreach (var detail in userDetails)
-            //    {
-            //        var slot = await _slotRepo.FindByIdAsync(detail.SlotId);
-
-            //        detail.Slot = slot;
-            //    }
-            //}
-
             var bookingList = await _bookingRepo.GetAllAsync();
             var userBookings = bookingList.Where(b => b.UserId == id).ToList();
             var bookingOverviews = new List<BookingOverviewDto>();
 
-            foreach (var booking in bookingList)
+            var bookingDetails = await _bookingDetailRepo.GetAllAsync();
+
+            foreach (var booking in userBookings)
             {
                 var arrivalDate = DateOnly.MinValue;
                 var startTime = TimeOnly.MaxValue;
@@ -189,7 +151,6 @@ namespace Services.Implement
                 var podTypeId = 0;
                 var podType = new PodType();
 
-                var bookingDetails = await _bookingDetailRepo.GetAllAsync();
                 var userDetails = bookingDetails.Where(d => d.BookingId == booking.Id).ToList();
 
                 foreach (var detail in userDetails)
@@ -376,6 +337,14 @@ namespace Services.Implement
 
             var user = await _userRepo.FindByIdAsync(userId);
 
+            var bookings = await _bookingRepo.GetAllAsync();
+            var ongoingBooking = bookings.FirstOrDefault(b => b.UserId == userId && b.BookingStatusId != 1 && b.BookingStatusId != 5);
+
+            if (ongoingBooking != null)
+            {
+                return new CreateBookingResponse { Success = false, Message = "There can only be one booking at a time." };
+            }
+
             var membership = await _membershipRepo.FindByIdAsync(user.MembershipId.Value);
             var discount = membership.Discount;
 
@@ -434,17 +403,18 @@ namespace Services.Implement
                 }
             }
 
-            var podPrice = (_podTypeRepo.FindByIdAsync(pod.PodTypeId).Result.Price) * request.ScheduleIds.Count;
+            var bookingPrice = (_podTypeRepo.FindByIdAsync(pod.PodTypeId).Result.Price) * request.ScheduleIds.Count;
+            var actualPrice = bookingPrice * (1 - (discount / 100.00));
 
             var booking = new Booking
             {
-                BookingPrice = podPrice,
+                BookingPrice = bookingPrice,
                 CreatedTime = DateTime.UtcNow,
                 BookingStatusId = 2,
                 UserId = userId,
                 MembershipId = membership.Id,
                 Discount = discount,
-                ActualPrice = (podPrice * discount) / 100,
+                ActualPrice = (int) actualPrice
             };
 
             try
@@ -506,7 +476,7 @@ namespace Services.Implement
                 return new CreateBookingResponse { Success = false, Message = "There is no booking with the id " + id };
             }
 
-            booking.BookingStatusId = 4;
+            booking.BookingStatusId = 3;
 
             try
             {
