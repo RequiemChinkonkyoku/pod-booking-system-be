@@ -47,24 +47,26 @@ namespace Services.Implement
                 throw new Exception("Booking does not exist");
             }
 
-            var allProduct = await _productRepo.GetAllAsync();
-            if (!allProduct.Any(c => c.Id == selectedProductDto.ProductId))
+            var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
+            if (product == null)
             {
                 throw new Exception("Product does not exist");
             }
+            if (product.Quantity < selectedProductDto.Quantity)
+            {
+                throw new Exception("Insufficient product stock");
+            }
 
             var existingSelectedProduct = (await _selectedProductRepo.GetAllAsync())
-        .FirstOrDefault(sp => sp.ProductId == selectedProductDto.ProductId && sp.BookingId == selectedProductDto.BookingId);
+                .FirstOrDefault(sp => sp.ProductId == selectedProductDto.ProductId && sp.BookingId == selectedProductDto.BookingId);
 
             if (existingSelectedProduct != null)
             {
                 existingSelectedProduct.Quantity += selectedProductDto.Quantity;
                 await _selectedProductRepo.UpdateAsync(existingSelectedProduct);
-                return existingSelectedProduct;
             }
             else
             {
-                var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
                 var selectedProduct = new SelectedProduct
                 {
                     Quantity = selectedProductDto.Quantity,
@@ -74,8 +76,13 @@ namespace Services.Implement
                 };
 
                 await _selectedProductRepo.AddAsync(selectedProduct);
-                return selectedProduct;
+                existingSelectedProduct = selectedProduct;
             }
+
+            product.Quantity -= selectedProductDto.Quantity;
+            await _productRepo.UpdateAsync(product);
+
+            return existingSelectedProduct;
         }
 
         public async Task<SelectedProduct> UpdateSelectedProductAsync(int id, UpdateSelectedProductDto selectedProductDto)
