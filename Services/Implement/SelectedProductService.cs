@@ -114,13 +114,17 @@ namespace Services.Implement
         public async Task<bool> DeleteSelectedProductAsync(int id)
         {
             bool result = false;
-            var product = await _selectedProductRepo.FindByIdAsync(id);
-            
-            if (product != null)
+            var selectedProduct = await _selectedProductRepo.FindByIdAsync(id);
+            var product = await _productRepo.FindByIdAsync(selectedProduct.ProductId);
+
+            if (selectedProduct != null)
             {
-                await _selectedProductRepo.DeleteAsync(product);
+                product.Quantity += selectedProduct.Quantity;
+                await _productRepo.UpdateAsync(product);
+                await _selectedProductRepo.DeleteAsync(selectedProduct);
                 result = true;
             }
+
 
             return result;
         }

@@ -25,9 +25,9 @@ namespace Services.Implement
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
             var categories = await _categoryRepo.GetAllAsync();
-            var allProducts = await _productRepo.GetAllAsync();
-            AssignProductToCategory(allProducts, categories);
-            categories = categories.Where(category => category.Products != null && category.Products.Any()).ToList();
+            //var allProducts = await _productRepo.GetAllAsync();
+            //AssignProductToCategory(allProducts, categories);
+            //categories = categories.Where(category => category.Products != null && category.Products.Any()).ToList();
             return categories;
         }
         private void AssignProductToCategory(List<Product> products, List<Category> category)
