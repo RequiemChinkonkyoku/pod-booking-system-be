@@ -11,8 +11,7 @@ namespace Services.Interface
     public interface IStaffAreaService
     {
         Task<StaffArea> AssignStaffAreaAsync(AssignStaffAreaDto assignStaffAreaDto);
-
-        Task<StaffArea> UpdateStaffAreaAsync(int id, AssignStaffAreaDto assignStaffAreaDto);
-
+        Task<StaffArea> GetStaffAreaByIdAsync(int id);
+        Task<StaffArea> UpdateStaffAreaAsync(/*int id, */AssignStaffAreaDto assignStaffAreaDto);
     }
 }
