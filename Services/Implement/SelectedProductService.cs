@@ -99,9 +99,18 @@ namespace Services.Implement
             {
                 throw new Exception("Selected Product NotFound");
             }
-
+            
             var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
-
+            if(selectedProductDto.Quantity > existingSelectedProduct.Quantity)
+            {
+                product.Quantity += selectedProductDto.Quantity - existingSelectedProduct.Quantity;
+                await _productRepo.UpdateAsync(product);
+            }
+            if (selectedProductDto.Quantity < existingSelectedProduct.Quantity)
+            {
+                product.Quantity -= existingSelectedProduct.Quantity - selectedProductDto.Quantity;
+                await _productRepo.UpdateAsync(product);
+            }
             existingSelectedProduct.Quantity = selectedProductDto.Quantity;
             existingSelectedProduct.ProductPrice = product.Price;
             existingSelectedProduct.ProductId = selectedProductDto.ProductId;
