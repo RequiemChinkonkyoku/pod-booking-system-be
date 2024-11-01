@@ -414,7 +414,7 @@ namespace Services.Implement
                 UserId = userId,
                 MembershipId = membership.Id,
                 Discount = discount,
-                ActualPrice = (int) actualPrice
+                ActualPrice = (int)actualPrice
             };
 
             try
@@ -653,6 +653,34 @@ namespace Services.Implement
             }
 
             return new UpdateBookingResponse { Success = true, Booking = booking };
+        }
+
+        public async Task<CheckinBookingResponse> CheckinBooking(int id)
+        {
+            if (id < 0)
+            {
+                return new CheckinBookingResponse { Success = false, Message = "BookingId must be given." };
+            }
+
+            var booking = await _bookingRepo.FindByIdAsync(id);
+
+            if (booking == null)
+            {
+                return new CheckinBookingResponse { Success = false, Message = "Unable to find booking with id " + id };
+            }
+
+            booking.BookingStatusId = 4;
+
+            try
+            {
+                await _bookingRepo.UpdateAsync(booking);
+            }
+            catch (Exception ex)
+            {
+                return new CheckinBookingResponse { Success = false, Message = "Unable to update status for booking." };
+            }
+
+            return new CheckinBookingResponse { Success = true, Booking = booking };
         }
 
         public async Task<FinishBookingResponse> FinishBooking(int id)
