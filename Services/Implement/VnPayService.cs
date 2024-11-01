@@ -107,7 +107,7 @@ namespace Services.Implement
                 return response;
             }
 
-            booking.BookingStatusId = 4;
+            booking.BookingStatusId = 3;
 
             try
             {
