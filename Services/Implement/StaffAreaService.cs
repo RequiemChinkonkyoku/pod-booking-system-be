@@ -18,10 +18,22 @@ namespace Services.Implement
         private readonly IRepositoryBase<User> _userRepo;
         public StaffAreaService(IRepositoryBase<StaffArea> staffAreaRepo, IRepositoryBase<Area> areaRepo, IRepositoryBase<User> userRepo)
         {
-                _staffAreaRepo = staffAreaRepo;
-                _areaRepo = areaRepo;
-                _userRepo = userRepo;
+            _staffAreaRepo = staffAreaRepo;
+            _areaRepo = areaRepo;
+            _userRepo = userRepo;
         }
+
+        public async Task<StaffArea> GetStaffAreaByIdAsync(int id)
+        {
+            var staffAreas = await _staffAreaRepo.GetAllAsync();
+            var result = staffAreas.FirstOrDefault(s => s.StaffId == id);
+            if (result == null)
+            {
+                return null;
+            }
+            return result;
+        }
+
 
         public async Task<StaffArea> AssignStaffAreaAsync(AssignStaffAreaDto assignStaffAreaDto)
         {
@@ -46,7 +58,7 @@ namespace Services.Implement
             return staffArea;
         }
 
-        public async Task<StaffArea> UpdateStaffAreaAsync(int id ,AssignStaffAreaDto assignStaffAreaDto)
+        public async Task<StaffArea> UpdateStaffAreaAsync(/*int id ,*/AssignStaffAreaDto assignStaffAreaDto)
         {
             var allAreas = await _areaRepo.GetAllAsync();
             if (!allAreas.Any(c => c.Id == assignStaffAreaDto.AreaId))
@@ -58,11 +70,12 @@ namespace Services.Implement
             {
                 throw new Exception("Staff does not exist");
             }
-            if (allUser.Any(u => u.Id == assignStaffAreaDto.StaffId && u.Id != id))
-            {
-                throw new Exception("Staff has been assign to different area");
-            }
-            var existingStaffArea = await _staffAreaRepo.FindByIdAsync(id);
+            //if (allUser.Any(u => u.Id == assignStaffAreaDto.StaffId/* && u.Id != id*/))
+            //{
+            //    throw new Exception("Staff has been assign to different area");
+            //}
+            //var existingStaffArea = await _staffAreaRepo.FindByIdAsync(id);
+            var existingStaffArea = _staffAreaRepo.GetAllAsync().Result.FirstOrDefault(s => s.StaffId == assignStaffAreaDto.StaffId);
             if (existingStaffArea == null)
             {
                 throw new Exception("Area not found");

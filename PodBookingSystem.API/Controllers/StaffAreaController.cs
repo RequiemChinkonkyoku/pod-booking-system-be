@@ -15,6 +15,21 @@ namespace PodBookingSystem.API.Controllers
             _staffAreaService = staffAreaService;
         }
 
+        [HttpGet("Staff/{id}")]
+        public async Task<IActionResult> AssignStaffArea(int id)
+        {
+            try
+            {
+                var staffArea = await _staffAreaService.GetStaffAreaByIdAsync(id);
+                return Ok(staffArea);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+
+        }
+
         [HttpPost]
         public async Task<IActionResult> AssignStaffArea([FromBody] AssignStaffAreaDto assignStaffAreaDto)
         {
@@ -30,8 +45,8 @@ namespace PodBookingSystem.API.Controllers
 
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStaffArea(int id, [FromBody] AssignStaffAreaDto AssignStaffAreaDto)
+        [HttpPut/*("{id}")*/]
+        public async Task<IActionResult> UpdateStaffArea(/*int id, */[FromBody] AssignStaffAreaDto AssignStaffAreaDto)
         {
             if (!ModelState.IsValid)
             {
@@ -40,7 +55,7 @@ namespace PodBookingSystem.API.Controllers
 
             try
             {
-                var updatedStaffArea = await _staffAreaService.UpdateStaffAreaAsync(id, AssignStaffAreaDto);
+                var updatedStaffArea = await _staffAreaService.UpdateStaffAreaAsync(/*id, */AssignStaffAreaDto);
                 if (updatedStaffArea == null)
                 {
                     return NotFound("StaffArea not found.");
