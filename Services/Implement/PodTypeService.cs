@@ -23,9 +23,9 @@ namespace Services.Implement
         public async Task<List<PodType>> GetAllPodTypesAsync()
         {
             var podTypes = await _podTypeRepo.GetAllAsync();
-            var allPod = await _podRepo.GetAllAsync();
-            AssignPodTypeToPod(podTypes, allPod);
-            podTypes = podTypes.Where(podTypes => podTypes.Pods != null && podTypes.Pods.Any()).ToList();
+            //var allPod = await _podRepo.GetAllAsync();
+            //AssignPodTypeToPod(podTypes, allPod);
+            //podTypes = podTypes.Where(podTypes => podTypes.Pods != null && podTypes.Pods.Any()).ToList();
             return podTypes;
         }
 

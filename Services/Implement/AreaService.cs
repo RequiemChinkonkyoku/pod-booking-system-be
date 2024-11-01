@@ -24,11 +24,11 @@ namespace Services.Implement
         {
             var areas = await _areaRepo.GetAllAsync();
 
-            var allPods = await _podRepo.GetAllAsync();
+            //var allPods = await _podRepo.GetAllAsync();
 
-            AssignPodsToAreas(areas, allPods);
+            //AssignPodsToAreas(areas, allPods);
 
-            areas = areas.Where(area => area.Pods != null && area.Pods.Any()).ToList();
+            //areas = areas.Where(area => area.Pods != null && area.Pods.Any()).ToList();
 
             return areas;
 

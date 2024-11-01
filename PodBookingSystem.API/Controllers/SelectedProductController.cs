@@ -77,7 +77,7 @@ namespace PodBookingSystem.API.Controllers
             }
         }
 
-        [HttpGet("/BookingID/{id}")]
+        [HttpGet("Booking/{id}")]
         public async Task<IActionResult> GetSelecetedProductByBookingID(int id)
         {
             try
@@ -88,7 +88,6 @@ namespace PodBookingSystem.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
-
             }
         }
     }
