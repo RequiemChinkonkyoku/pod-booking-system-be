@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Models;
 using Models.DTOs;
 using Repositories;
@@ -19,13 +20,18 @@ namespace Services.Implement
         private readonly IRepositoryBase<PodType> _podTypeRepo;
         private readonly IRepositoryBase<Slot> _slotRepo;
         private readonly IRepositoryBase<Schedule> _scheduleRepo;
-        public PodService(IRepositoryBase<Pod> podRepo , IRepositoryBase<Area> areaRepo, IRepositoryBase<PodType> podTypeRepo, IRepositoryBase<Slot> slotRepo, IRepositoryBase<Schedule> scheduleRepo)
+        private readonly IRepositoryBase<Booking> _bookingRepo;
+        private readonly IRepositoryBase<BookingDetail> _bookingDetailRepo;
+
+        public PodService(IRepositoryBase<Pod> podRepo , IRepositoryBase<Area> areaRepo, IRepositoryBase<PodType> podTypeRepo, IRepositoryBase<Slot> slotRepo, IRepositoryBase<Schedule> scheduleRepo, IRepositoryBase<Booking> bookingRepo, IRepositoryBase<BookingDetail> bookingDetailRepo)
         {
             _podRepo = podRepo;
             _areaRepo = areaRepo;
             _podTypeRepo = podTypeRepo;
             _slotRepo = slotRepo;
             _scheduleRepo = scheduleRepo;
+            _bookingRepo = bookingRepo;
+            _bookingDetailRepo = bookingDetailRepo;
         }
 
         public async Task<List<Pod>> GetAllPodsAsync()
@@ -121,7 +127,23 @@ namespace Services.Implement
             {
                 throw new Exception("Pod not found");
             }
+            var allBookings = await _bookingRepo.GetAllAsync();
 
+            var allSlots = await _slotRepo.GetAllAsync(); 
+
+            
+            var podSlots = allSlots.Where(s => s.PodId == podId).Select(s => s.Id).ToList();
+
+            
+            var associatedBookings = allBookings
+                .Where(b => _bookingDetailRepo.GetAllAsync().Result.Any(bd => bd.BookingId == b.Id && podSlots.Contains(bd.SlotId)))
+                .Where(b => b.BookingStatusId != 5)
+                .ToList();
+
+            if (associatedBookings.Any())
+            {
+                throw new Exception("Cannot delete Pod with incomplete bookings.");
+            }
             existingPod.Status = 0;
 
             await _podRepo.UpdateAsync(existingPod);

@@ -85,11 +85,7 @@ namespace PodBookingSystem.API.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Pod not found")
-                {
-                    return NotFound("Pod not found");
-                }
-                return StatusCode(500, "An error occurred while deleting the pod.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
         [HttpGet("Available/{podTypeId}")]
