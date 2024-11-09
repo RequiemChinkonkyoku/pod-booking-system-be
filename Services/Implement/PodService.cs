@@ -142,7 +142,9 @@ namespace Services.Implement
 
             if (associatedBookings.Any())
             {
-                throw new Exception("Cannot delete Pod with incomplete bookings.");
+                existingPod.Status = 2;
+                await _podRepo.UpdateAsync(existingPod);
+                return existingPod;
             }
             existingPod.Status = 0;
 
@@ -159,7 +161,7 @@ namespace Services.Implement
             var availablePods = allPods
                 .Where(p => p.PodTypeId == podTypeId &&
                             p.Status == 1 &&
-                            !allSlots.Any(s => s.PodId == p.Id && s.ScheduleId == scheduleId && s.ArrivalDate == arrivalDate)) // Exclude pods that have slots on the specified ScheduleId and ArrivalDate
+                            !allSlots.Any(s => s.PodId == p.Id && s.ScheduleId == scheduleId && s.ArrivalDate == arrivalDate)) 
                 .ToList();
 
             return availablePods;
