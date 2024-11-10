@@ -160,8 +160,11 @@ namespace Services.Implement
 
             var availablePods = allPods
                 .Where(p => p.PodTypeId == podTypeId &&
-                            p.Status == 1 &&
-                            !allSlots.Any(s => s.PodId == p.Id && s.ScheduleId == scheduleId && s.ArrivalDate == arrivalDate)) 
+                    p.Status == 1 && 
+                    !allSlots.Any(s => s.PodId == p.Id &&
+                                       s.ScheduleId == scheduleId &&
+                                       s.ArrivalDate == arrivalDate &&
+                                       s.Status != 0)) 
                 .ToList();
 
             return availablePods;
