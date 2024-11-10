@@ -15,26 +15,28 @@ namespace Services.Implement
         private readonly IRepositoryBase<Slot> _slotRepo;
         private readonly IRepositoryBase<Pod> _podRepo;
         private readonly IRepositoryBase<Schedule> _scheduleRepo;
+        private readonly IRepositoryBase<BookingDetail> _bookingDetailRepo;
 
-        public SlotService(IRepositoryBase<Slot> slotRepo, IRepositoryBase<Pod> podRepo, IRepositoryBase<Schedule> scheduleRepo)
+        public SlotService(IRepositoryBase<Slot> slotRepo, IRepositoryBase<Pod> podRepo, IRepositoryBase<Schedule> scheduleRepo, IRepositoryBase<BookingDetail> bookingDetailRepo)
         {
             _slotRepo = slotRepo;
             _podRepo = podRepo;
             _scheduleRepo = scheduleRepo;
+            _bookingDetailRepo = bookingDetailRepo;
         }
 
 
         public async Task<List<Slot>> GetSlotBySlotTypeAsync(int id)
         {
-            var allPods = await _podRepo.GetAllAsync(); 
+            var allPods = await _podRepo.GetAllAsync();
             var relevantPodIds = allPods
                 .Where(p => p.PodTypeId == id)
                 .Select(p => p.Id)
                 .ToList();
             var allSlots = await _slotRepo.GetAllAsync();
-            
+
             var filteredSlots = allSlots
-                .Where(s => s.PodId.HasValue && relevantPodIds.Contains(s.PodId.Value)) 
+                .Where(s => s.PodId.HasValue && relevantPodIds.Contains(s.PodId.Value))
                 .ToList();
 
             return filteredSlots;
@@ -48,23 +50,22 @@ namespace Services.Implement
                 .Select(p => p.Id)
                 .ToList();
 
-            
+
             var allSlots = await _slotRepo.GetAllAsync();
 
             var fullyBookedSlots = allSlots
-                .Where(s => s.PodId.HasValue && relevantPodIds.Contains(s.PodId.Value) /*&& s.Status == 1*/)
-                .GroupBy(s => new { s.ScheduleId, s.ArrivalDate }) 
+                .Where(s => s.PodId.HasValue && relevantPodIds.Contains(s.PodId.Value) && s.Status == 1)
+                .GroupBy(s => new { s.ScheduleId, s.ArrivalDate })
                 .Where(g => g.Select(slot => slot.PodId).Distinct().Count() == relevantPodIds.Count)
                 .Select(g => new FullyBookedSlotDto
                 {
                     ScheduleId = g.Key.ScheduleId,
-                    ArrivalDate = g.Key.ArrivalDate 
+                    ArrivalDate = g.Key.ArrivalDate
                 })
                 .ToList();
 
 
             return fullyBookedSlots;
-
         }
     }
 }
