@@ -18,12 +18,16 @@ namespace Services.Implement
     public class UserService : IUserService
     {
         private readonly IRepositoryBase<User> _userRepo;
+        private readonly IRepositoryBase<Booking> _bookingRepo;
         private readonly IConfiguration _config;
+        private readonly IBookingService _bookingService;
 
-        public UserService(IRepositoryBase<User> userRepo, IConfiguration config)
+        public UserService(IRepositoryBase<User> userRepo, IRepositoryBase<Booking> bookingRepo, IConfiguration config, IBookingService bookingService)
         {
             _userRepo = userRepo;
+            _bookingRepo = bookingRepo;
             _config = config;
+            _bookingService = bookingService;
         }
 
         public async Task<string> Login(string email, string password)
@@ -190,6 +194,26 @@ namespace Services.Implement
             if (user == null)
             {
                 throw new ArgumentException("User not found.");
+            }
+
+            var userBookings = _bookingRepo.GetAllAsync().Result.Where(b => b.UserId == userId);
+            if (userBookings.Any())
+            {
+                var userValidBookings = userBookings.Where(b => (b.BookingStatusId == 2 || b.BookingStatusId == 3));
+                if (userValidBookings.Any())
+                {
+                    foreach (var booking in userValidBookings)
+                    {
+                        try
+                        {
+                            await _bookingService.CancelBooking(booking.Id, userId);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new ArgumentException("Booking cancel error sth idk.");
+                        }
+                    }
+                }
             }
 
             user.Status = -1;

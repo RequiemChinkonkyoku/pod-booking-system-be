@@ -328,5 +328,103 @@ namespace Services.Implement
             return true;
         }
 
+        public async Task<string> ForgotPasswordAsync(string email)
+        {
+            // Step 1: Validate that the email exists in the system.
+            var users = await _userRepo.GetAllAsync();
+            var user = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+            if (user == null)
+            {
+                throw new ArgumentException("No user found with this email.");
+            }
+
+            // Step 2: Generate a new OTP.
+            string otpCode = await GenerateCustomOtp();
+            var expirationTime = DateTime.UtcNow.AddMinutes(15); // OTP valid for 15 minutes.
+
+            // Step 3: Update or create a new OTP record for the user.
+            var otpList = await _userOtpRepo.GetAllAsync();
+            var existingOtp = otpList.FirstOrDefault(o => o.UserId == user.Id);
+
+            if (existingOtp != null)
+            {
+                // Update the existing OTP record with a new OTP and expiration time.
+                existingOtp.OtpCode = otpCode;
+                existingOtp.ExpirationTime = expirationTime;
+                existingOtp.IsExpiredOrUsed = false;
+                await _userOtpRepo.UpdateAsync(existingOtp);
+            }
+            else
+            {
+                // Create a new OTP record if it does not exist.
+                var newUserOtp = new UserOtp
+                {
+                    OtpCode = otpCode,
+                    ExpirationTime = expirationTime,
+                    UserId = user.Id
+                };
+                await _userOtpRepo.AddAsync(newUserOtp);
+            }
+
+            // Step 4: Send the OTP to the user's email.
+            SendEmailAsync(user.Email, "Password Reset OTP", user.Name, otpCode);
+
+            return "A password reset OTP has been sent to your email.";
+        }
+
+        public async Task<bool> ResetPasswordAsync(string email, string otpCode, string newPassword)
+        {
+            // Step 1: Retrieve the user by email.
+            var users = await _userRepo.GetAllAsync();
+            var user = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+            if (user == null)
+            {
+                throw new ArgumentException("No user found with this email.");
+            }
+
+            // Step 2: Retrieve and validate the OTP.
+            var otpList = await _userOtpRepo.GetAllAsync();
+            var existingOtp = otpList.FirstOrDefault(o => o.UserId == user.Id);
+
+            if (existingOtp == null)
+            {
+                throw new ArgumentException("No OTP record found for this user.");
+            }
+
+            // Step 3: Check OTP validity.
+            if (existingOtp.IsExpiredOrUsed || existingOtp.ExpirationTime < DateTime.UtcNow)
+            {
+                throw new ArgumentException("The OTP is invalid or has expired.");
+            }
+
+            if (!existingOtp.OtpCode.Equals(otpCode, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Invalid OTP code.");
+            }
+
+            // Step 4: Validate the new password.
+            if (string.IsNullOrWhiteSpace(newPassword))
+            {
+                throw new ArgumentException("Password cannot be empty.");
+            }
+
+            if (!IsPasswordValid(newPassword))
+            {
+                throw new ArgumentException("Password must be at least 8 characters long, contain at least 1 capital letter, 1 normal letter, 1 special character, and 1 number.");
+            }
+
+            // Step 5: Hash the new password and update the user record.
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            await _userRepo.UpdateAsync(user);
+
+            // Step 6: Mark the OTP as used.
+            existingOtp.IsExpiredOrUsed = true;
+            await _userOtpRepo.UpdateAsync(existingOtp);
+
+            return true;
+        }
+
     }
 }
