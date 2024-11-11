@@ -129,18 +129,22 @@ namespace Services.Implement
             }
             var allBookings = await _bookingRepo.GetAllAsync();
 
-            var allSlots = await _slotRepo.GetAllAsync(); 
-
-            
-            var podSlots = allSlots.Where(s => s.PodId == podId).Select(s => s.Id).ToList();
-
-            
-            var associatedBookings = allBookings
-                .Where(b => _bookingDetailRepo.GetAllAsync().Result.Any(bd => bd.BookingId == b.Id && podSlots.Contains(bd.SlotId)))
-                .Where(b => b.BookingStatusId != 5)
+            var allSlots = await _slotRepo.GetAllAsync();
+            var allBookingDetails = await _bookingDetailRepo.GetAllAsync();
+            var podSlots = (await _slotRepo.GetAllAsync())
+                .Where(s => s.PodId == podId)
+                .Select(s => s.Id)
                 .ToList();
 
-            if (associatedBookings.Any())
+            var relatedBookingDetails = (await _bookingDetailRepo.GetAllAsync())
+                .Where(bd => podSlots.Contains(bd.SlotId))
+                .ToList();
+
+            var hasIncompleteBooking = relatedBookingDetails
+            .Any(bd => allBookings.Any(b => b.Id == bd.BookingId && b.BookingStatusId != 5));
+
+
+            if (hasIncompleteBooking)
             {
                 existingPod.Status = 2;
                 await _podRepo.UpdateAsync(existingPod);
