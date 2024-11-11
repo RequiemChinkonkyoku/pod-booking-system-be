@@ -31,6 +31,7 @@ namespace Services.Implement
             _transactionRepo = transactionRepo;
             _userRepo = userRepo;
         }
+
         public async Task<string> CreatePaymentUrl(VnpayInfoModel model, HttpContext context)
         {
             var user = await _userRepo.FindByIdAsync(model.UserId);
@@ -97,6 +98,9 @@ namespace Services.Implement
                     amount = part.Replace("Amount: ", "").Trim();
                 }
             }
+
+            response.BookingId = bookingId;
+            response.Amount = amount;
 
             var booking = await _bookingRepo.FindByIdAsync(Int32.Parse(bookingId));
 
