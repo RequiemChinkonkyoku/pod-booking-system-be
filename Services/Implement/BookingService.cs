@@ -25,7 +25,8 @@ namespace Services.Implement
         private readonly IRepositoryBase<User> _userRepo;
         private readonly IRepositoryBase<Membership> _membershipRepo;
         private readonly IRepositoryBase<Area> _areaRepo;
-
+        private readonly IRepositoryBase<SelectedProduct> _selectedProductRepo;
+        private readonly IRepositoryBase<Product> _productRepo;
         public BookingService(IRepositoryBase<Booking> bookingRepo,
                               IRepositoryBase<BookingStatus> bookingStatusRepo,
                               IRepositoryBase<BookingDetail> bookingDetailRepo,
@@ -35,7 +36,9 @@ namespace Services.Implement
                               IRepositoryBase<Slot> slotRepo,
                               IRepositoryBase<User> userRepo,
                               IRepositoryBase<Membership> membershipRepo,
-                              IRepositoryBase<Area> areaRepo)
+                              IRepositoryBase<Area> areaRepo,
+                              IRepositoryBase<SelectedProduct> selectedProductRepo,
+                              IRepositoryBase<Product> productRepo)
         {
             _bookingRepo = bookingRepo;
             _bookingStatusRepo = bookingStatusRepo;
@@ -47,6 +50,8 @@ namespace Services.Implement
             _userRepo = userRepo;
             _membershipRepo = membershipRepo;
             _areaRepo = areaRepo;
+            _selectedProductRepo = selectedProductRepo;
+            _productRepo = productRepo;
         }
 
         public async Task<GetBookingResponse> GetAllBookings()
@@ -317,6 +322,27 @@ namespace Services.Implement
                 catch (Exception ex)
                 {
                     return new CancelBookingResponse { Success = false, Message = "Unable to update the slot status." };
+                }
+            }
+            var selectedProducts = await _selectedProductRepo.GetAllAsync();
+            var bookingSelectedProducts = selectedProducts.Where(sp => sp.BookingId == booking.Id);
+
+            foreach (var selectedProduct in bookingSelectedProducts)
+            {
+                var product = await _productRepo.FindByIdAsync(selectedProduct.ProductId);
+
+                if (product != null)
+                {
+                    product.Quantity += selectedProduct.Quantity;
+
+                    try
+                    {
+                        await _productRepo.UpdateAsync(product);
+                    }
+                    catch (Exception ex)
+                    {
+                        return new CancelBookingResponse { Success = false, Message = "Unable to restore product quantity." };
+                    }
                 }
             }
 
