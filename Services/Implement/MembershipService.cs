@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using Models.DTOs;
@@ -69,7 +70,14 @@ namespace Services.Implement
                 return new MembershipServiceResponse { Success = false, Message = "All fields must be given." };
             }
 
-            var membership = new Membership { Name = request.Name.Trim(), Description = request.Description.Trim(), Status = 1, Discount = request.Discount };
+            var membership = new Membership
+            {
+                Name = request.Name.Trim(),
+                Description = request.Description.Trim(),
+                Status = 1,
+                Discount = request.Discount,
+                PointsRequirement = request.PointsRequirement
+            };
 
             try
             {
@@ -78,6 +86,27 @@ namespace Services.Implement
             catch (Exception ex)
             {
                 return new MembershipServiceResponse { Success = false, Message = "There has been an error creating membership." };
+            }
+
+            var users = await _userRepo.GetAllAsync();
+
+            var validUsers = users.Where(u => u.LoyaltyPoints >= membership.PointsRequirement);
+
+            if (validUsers.Any())
+            {
+                foreach (var user in validUsers)
+                {
+                    user.MembershipId = membership.Id;
+
+                    try
+                    {
+                        await _userRepo.UpdateAsync(user);
+                    }
+                    catch (Exception ex)
+                    {
+                        return new MembershipServiceResponse { Success = false, Message = "Unable to update membership for user " + user.Id };
+                    }
+                }
             }
 
             return new MembershipServiceResponse { Success = true, Membership = membership };
@@ -99,6 +128,8 @@ namespace Services.Implement
 
             membership.Name = request.Name.Trim();
             membership.Description = request.Description.Trim();
+            membership.Discount = request.Discount;
+            membership.PointsRequirement = request.PointsRequirement;
 
             try
             {
@@ -107,6 +138,27 @@ namespace Services.Implement
             catch (Exception ex)
             {
                 return new MembershipServiceResponse { Success = false, Message = $"There has been an error updating membership." };
+            }
+
+            var users = await _userRepo.GetAllAsync();
+
+            var validUsers = users.Where(u => u.LoyaltyPoints >= membership.PointsRequirement);
+
+            if (validUsers.Any())
+            {
+                foreach (var user in validUsers)
+                {
+                    user.MembershipId = membership.Id;
+
+                    try
+                    {
+                        await _userRepo.UpdateAsync(user);
+                    }
+                    catch (Exception ex)
+                    {
+                        return new MembershipServiceResponse { Success = false, Message = "Unable to update membership for user " + user.Id };
+                    }
+                }
             }
 
             return new MembershipServiceResponse { Success = true, Membership = membership };
