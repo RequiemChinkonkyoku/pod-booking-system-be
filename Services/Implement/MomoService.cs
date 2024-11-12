@@ -23,14 +23,22 @@ namespace Services.Implement
         private readonly HttpClient _client;
         private readonly IRepositoryBase<Booking> _bookingRepo;
         private readonly IRepositoryBase<Transaction> _transRepo;
+        private readonly IRepositoryBase<User> _userRepo;
+        private readonly IMembershipService _memberService;
 
-        public MomoService(IOptions<MomoOptionModel> options, IRepositoryBase<Booking> bookingRepo, IRepositoryBase<Transaction> transRepo)
+        public MomoService(IOptions<MomoOptionModel> options,
+                           IRepositoryBase<Booking> bookingRepo,
+                           IRepositoryBase<Transaction> transRepo,
+                           IRepositoryBase<User> userRepo,
+                           IMembershipService memberService)
         {
             _options = options;
             _client = new HttpClient();
             _client.BaseAddress = new Uri(_options.Value.MomoApiUrl);
             _bookingRepo = bookingRepo;
             _transRepo = transRepo;
+            _userRepo = userRepo;
+            _memberService = memberService;
         }
 
         public async Task<CreatePaymentResponse> CreatePaymentAsync(CreatePaymentRequest request)
@@ -120,6 +128,34 @@ namespace Services.Implement
                 catch (Exception ex)
                 {
                     return new MomoExecuteResponse { Success = false, Message = "Unable to update booking status" };
+                }
+
+                var user = await _userRepo.FindByIdAsync(booking.UserId);
+                var pointGained = (int)Math.Floor(Int32.Parse(amount) / 1000.0);
+                user.LoyaltyPoints += pointGained;
+
+                while (true)
+                {
+                    var membershipProgress = await _memberService.GetMembershipProgress(booking.UserId);
+                    var nextMembership = membershipProgress.NextMembership;
+
+                    if (nextMembership != null && user.LoyaltyPoints >= nextMembership.PointsRequirement)
+                    {
+                        user.MembershipId = nextMembership.Id;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                try
+                {
+                    await _userRepo.UpdateAsync(user);
+                }
+                catch (Exception ex)
+                {
+                    return new MomoExecuteResponse { Success = false, Message = "Unable to update user loyalty point." };
                 }
             }
 

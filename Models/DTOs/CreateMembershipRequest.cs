@@ -12,6 +12,8 @@ namespace Models.DTOs
 
         public string Description { get; set; }
 
+        public string PointsRequirement { get; set; }
+
         public int Discount { get; set; }
     }
 }

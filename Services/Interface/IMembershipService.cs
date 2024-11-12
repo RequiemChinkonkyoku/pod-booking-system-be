@@ -18,5 +18,6 @@ namespace Services.Interface
         public Task<MembershipServiceResponse> ToggleMembership(int id);
         public Task<MembershipServiceResponse> SignUp(int id, int userId);
         public Task<MembershipServiceResponse> CancelMembership(int userId);
+        public Task<GetMembershipResponse> GetMembershipProgress(int userId);
     }
 }

@@ -23,13 +23,19 @@ namespace Services.Implement
         private readonly IRepositoryBase<Booking> _bookingRepo;
         private readonly IRepositoryBase<Transaction> _transactionRepo;
         private readonly IRepositoryBase<User> _userRepo;
+        private readonly IMembershipService _memberService;
 
-        public VnPayService(IConfiguration configuration, IRepositoryBase<Booking> bookingRepo, IRepositoryBase<Transaction> transactionRepo, IRepositoryBase<User> userRepo)
+        public VnPayService(IConfiguration configuration,
+                            IRepositoryBase<Booking> bookingRepo,
+                            IRepositoryBase<Transaction> transactionRepo, 
+                            IRepositoryBase<User> userRepo,
+                            IMembershipService memberService)
         {
             _configuration = configuration;
             _bookingRepo = bookingRepo;
             _transactionRepo = transactionRepo;
             _userRepo = userRepo;
+            _memberService = memberService;
         }
         public async Task<string> CreatePaymentUrl(VnpayInfoModel model, HttpContext context)
         {
@@ -140,6 +146,34 @@ namespace Services.Implement
                 response.Message = $"There has been an error adding transaction. {ex.Message}";
 
                 return response;
+            }
+
+            var user = await _userRepo.FindByIdAsync(booking.UserId);
+            var pointGained = (int)Math.Floor(Int32.Parse(amount) / 1000.0);
+            user.LoyaltyPoints += pointGained;
+
+            while (true)
+            {
+                var membershipProgress = await _memberService.GetMembershipProgress(booking.UserId);
+                var nextMembership = membershipProgress.NextMembership;
+
+                if (nextMembership != null && user.LoyaltyPoints >= nextMembership.PointsRequirement)
+                {
+                    user.MembershipId = nextMembership.Id;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            try
+            {
+                await _userRepo.UpdateAsync(user);
+            }
+            catch (Exception ex)
+            {
+                return new VnpayResponseModel { Success = false, Message = "Unable to update user loyalty point." };
             }
 
             return response;

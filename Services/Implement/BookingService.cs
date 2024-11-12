@@ -25,6 +25,7 @@ namespace Services.Implement
         private readonly IRepositoryBase<User> _userRepo;
         private readonly IRepositoryBase<Membership> _membershipRepo;
         private readonly IRepositoryBase<Area> _areaRepo;
+        private readonly IMembershipService _memberService;
 
         public BookingService(IRepositoryBase<Booking> bookingRepo,
                               IRepositoryBase<BookingStatus> bookingStatusRepo,
@@ -35,7 +36,8 @@ namespace Services.Implement
                               IRepositoryBase<Slot> slotRepo,
                               IRepositoryBase<User> userRepo,
                               IRepositoryBase<Membership> membershipRepo,
-                              IRepositoryBase<Area> areaRepo)
+                              IRepositoryBase<Area> areaRepo,
+                              IMembershipService memberService)
         {
             _bookingRepo = bookingRepo;
             _bookingStatusRepo = bookingStatusRepo;
@@ -47,6 +49,7 @@ namespace Services.Implement
             _userRepo = userRepo;
             _membershipRepo = membershipRepo;
             _areaRepo = areaRepo;
+            _memberService = memberService;
         }
 
         public async Task<GetBookingResponse> GetAllBookings()
@@ -278,6 +281,7 @@ namespace Services.Implement
         public async Task<CancelBookingResponse> CancelBooking(int id, int userId)
         {
             var booking = await _bookingRepo.FindByIdAsync(id);
+            var statusId = booking.BookingStatusId;
 
             if (booking == null)
             {
@@ -317,6 +321,39 @@ namespace Services.Implement
                 catch (Exception ex)
                 {
                     return new CancelBookingResponse { Success = false, Message = "Unable to update the slot status." };
+                }
+            }
+
+            if (statusId == 3)
+            {
+                var user = await _userRepo.FindByIdAsync(booking.UserId);
+                var pointReduced = (int)Math.Floor(booking.ActualPrice / 1000.0);
+                user.LoyaltyPoints -= pointReduced;
+
+                while (true)
+                {
+                    var membershipProgress = await _memberService.GetMembershipProgress(user.Id);
+                    var previousMembership = membershipProgress.PreviousMembership;
+
+                    if (previousMembership != null &&
+                        previousMembership.PointsRequirement >= 0 &&
+                        user.LoyaltyPoints < previousMembership.PointsRequirement)
+                    {
+                        user.MembershipId = previousMembership.Id;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                try
+                {
+                    await _userRepo.UpdateAsync(user);
+                }
+                catch (Exception ex)
+                {
+                    return new CancelBookingResponse { Success = false, Message = "Unable to update user loyalty point." };
                 }
             }
 
@@ -678,6 +715,34 @@ namespace Services.Implement
             catch (Exception ex)
             {
                 return new CheckinBookingResponse { Success = false, Message = "Unable to update status for booking." };
+            }
+
+            var user = await _userRepo.FindByIdAsync(booking.UserId);
+            var pointGained = (int)Math.Floor(booking.ActualPrice / 1000.0);
+            user.LoyaltyPoints += pointGained;
+
+            while (true)
+            {
+                var membershipProgress = await _memberService.GetMembershipProgress(booking.UserId);
+                var nextMembership = membershipProgress.NextMembership;
+
+                if (nextMembership != null && user.LoyaltyPoints >= nextMembership.PointsRequirement)
+                {
+                    user.MembershipId = nextMembership.Id;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            try
+            {
+                await _userRepo.UpdateAsync(user);
+            }
+            catch (Exception ex)
+            {
+                return new CheckinBookingResponse { Success = false, Message = "Unable to update user loyalty point." };
             }
 
             return new CheckinBookingResponse { Success = true, Booking = booking };
