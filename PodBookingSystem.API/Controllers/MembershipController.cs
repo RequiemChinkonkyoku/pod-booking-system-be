@@ -198,5 +198,31 @@ namespace PodBookingSystem.API.Controllers
                 return BadRequest(response.Message);
             }
         }
+
+        [HttpGet("get-membership-progress")]
+        public async Task<IActionResult> GetMembershipProgress()
+        {
+            int userId = 0;
+
+            try
+            {
+                userId = Int32.Parse(User.FindFirst(ClaimTypes.Name).Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized("You must login to perform this task.");
+            }
+
+            var response = await _memberService.GetMembershipProgress(userId);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
+        }
     }
 }

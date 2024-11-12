@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.IdentityModel.Tokens;
 using Models;
 using Models.DTOs;
 using Repositories.Interface;
@@ -213,6 +214,40 @@ namespace Services.Implement
             }
 
             return new MembershipServiceResponse { Success = true };
+        }
+
+        public async Task<GetMembershipResponse> GetMembershipProgress(int userId)
+        {
+            var user = await _userRepo.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new GetMembershipResponse { Success = false, Message = "Unable to find the user." };
+            }
+
+            var memberships = await _memberRepo.GetAllAsync();
+
+            var orderedMemberships = memberships.OrderBy(m => m.PointsRequirement).ToList();
+
+            var currentMembership = orderedMemberships.FirstOrDefault(m => m.Id == user.MembershipId);
+
+            if (currentMembership == null)
+            {
+                return new GetMembershipResponse { Success = false, Message = "Unable to find current membership." };
+            }
+
+            var nextMembership = orderedMemberships.FirstOrDefault(m => m.PointsRequirement > currentMembership.PointsRequirement);
+            var previousMembership = orderedMemberships.LastOrDefault(m => m.PointsRequirement < currentMembership.PointsRequirement);
+
+            return new GetMembershipResponse
+            {
+                Success = true,
+                Message = nextMembership != null ? "Next membership available" : "No futher membership available.",
+                Point = user.LoyaltyPoints,
+                CurrentMembership = currentMembership,
+                NextMembership = nextMembership,
+                PreviousMembership = previousMembership
+            };
         }
     }
 }

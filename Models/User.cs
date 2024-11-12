@@ -34,6 +34,7 @@ namespace Models
 
         public int? Status { get; set; }
 
+        public int LoyaltyPoints { get; set; }
         public int? MembershipId { get; set; }
         public Membership Membership { get; set; }
 

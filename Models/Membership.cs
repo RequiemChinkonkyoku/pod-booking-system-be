@@ -15,6 +15,7 @@ namespace Models
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
+        public int PointsRequirement { get; set; }
         public int Discount { get; set; }
         public int Status { get; set; }
         public ICollection<User> Users { get; set; }
