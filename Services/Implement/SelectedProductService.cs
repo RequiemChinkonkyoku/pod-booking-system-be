@@ -101,7 +101,12 @@ namespace Services.Implement
             }
             
             var product = await _productRepo.FindByIdAsync(selectedProductDto.ProductId);
-            if(selectedProductDto.Quantity > existingSelectedProduct.Quantity)
+            if (product.Quantity < selectedProductDto.Quantity)
+            {
+                throw new Exception("Selected Product Quantity cannot be Larger than Product Quantity");
+
+            }
+            if (selectedProductDto.Quantity > existingSelectedProduct.Quantity)
             {
                 product.Quantity -= selectedProductDto.Quantity - existingSelectedProduct.Quantity;
                 await _productRepo.UpdateAsync(product);
