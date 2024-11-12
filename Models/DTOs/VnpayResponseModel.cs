@@ -17,5 +17,7 @@ namespace Models.DTOs
         public string Message { get; set; }
         public string Token { get; set; }
         public string VnPayResponseCode { get; set; }
+        public string Amount { get; set; }
+        public string BookingId { get; set; }
     }
 }

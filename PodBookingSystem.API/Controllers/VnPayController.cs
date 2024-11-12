@@ -35,10 +35,17 @@ namespace PodBookingSystem.API.Controllers
             return Ok(url);
         }
 
-        [HttpGet("payment-callback")]
+        [HttpPost("payment-callback")]
         public async Task<IActionResult> PaymentCallBack()
         {
-            var response = await _vnpService.PaymentExecute(Request.Query);
+            var query = Request.Query;
+
+            if (query == null || query.IsNullOrEmpty())
+            {
+                return BadRequest("There has been an error during the payment process");
+            }
+
+            var response = await _vnpService.PaymentExecute(query);
 
             if (response.Success)
             {

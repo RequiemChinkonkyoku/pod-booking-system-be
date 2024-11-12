@@ -171,17 +171,19 @@ namespace Services.Implement
                 throw new ArgumentException("Name cannot be empty.");
             }
 
-            if (!string.IsNullOrWhiteSpace(dto.Password))
+            if (string.IsNullOrWhiteSpace(dto.Email))
             {
-                if (!IsPasswordValid(dto.Password))
-                {
-                    throw new ArgumentException("Password must be at least 8 characters long, contain at least 1 capital letter, 1 normal letter, 1 special character, and 1 number.");
-                }
+                throw new ArgumentException("Email cannot be empty.");
+            }
 
-                existingUser.Password = dto.Password;
+            if (dto.Status == null)
+            {
+                throw new ArgumentException("Status cannot be empty.");
             }
 
             existingUser.Name = dto.Name;
+            existingUser.Email = dto.Email;
+            existingUser.Status = dto.Status;
 
             await _userRepo.UpdateAsync(existingUser);
 
