@@ -294,11 +294,6 @@ namespace Services.Implement
                 return new CancelBookingResponse { Success = false, Message = "The BookingId does not exist." };
             }
 
-            if (booking.UserId != userId)
-            {
-                return new CancelBookingResponse { Success = false, Message = "The Booking does not belong to this user." };
-            }
-
             booking.BookingStatusId = 1;
 
             try
@@ -791,6 +786,21 @@ namespace Services.Implement
             }
 
             booking.BookingStatusId = 5;
+
+            var selectedProducts = await _selectedProductRepo.GetAllAsync();
+            var bookingProducts = selectedProducts.Where(sp => sp.BookingId == booking.Id);
+
+            if (bookingProducts.Any())
+            {
+                var productPrice = 0;
+
+                foreach (var bProduct in bookingProducts)
+                {
+                    productPrice += (bProduct.ProductPrice * bProduct.Quantity);
+                }
+
+                booking.ActualPrice += productPrice;
+            }
 
             try
             {
