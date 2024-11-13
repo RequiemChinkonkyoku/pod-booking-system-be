@@ -187,114 +187,114 @@ namespace Repositories
                     Name = "Completed",
                 });
 
-            modelBuilder.Entity<Booking>().HasData(
-                new Booking
-                {
-                    Id = 1,
-                    BookingPrice = 10000,
-                    CreatedTime = DateTime.Now,
-                    BookingStatusId = 5,
-                    UserId = 1,
+            //modelBuilder.Entity<Booking>().HasData(
+            //    new Booking
+            //    {
+            //        Id = 1,
+            //        BookingPrice = 10000,
+            //        CreatedTime = DateTime.Now,
+            //        BookingStatusId = 5,
+            //        UserId = 1,
 
-                },
-                new Booking
-                {
-                    Id = 2,
-                    BookingPrice = 10000,
-                    CreatedTime = DateTime.Now,
-                    BookingStatusId = 5,
-                    UserId = 2,
+            //    },
+            //    new Booking
+            //    {
+            //        Id = 2,
+            //        BookingPrice = 10000,
+            //        CreatedTime = DateTime.Now,
+            //        BookingStatusId = 5,
+            //        UserId = 2,
 
-                });
+            //    });
 
-            modelBuilder.Entity<Area>().HasData(
-                new Area
-                {
-                    Id = 1,
-                    Name = "Area A",
-                    Location = "Floor 1",
-                    Description = "Beautiful location."
-                });
+            //modelBuilder.Entity<Area>().HasData(
+            //    new Area
+            //    {
+            //        Id = 1,
+            //        Name = "Area A",
+            //        Location = "Floor 1",
+            //        Description = "Beautiful location."
+            //    });
 
-            modelBuilder.Entity<PodType>().HasData(
-                new PodType
-                {
-                    Id = 1,
-                    Name = "Single Pod",
-                    Description = "Pod for one.",
-                    Price = 10000
-                },
-                new PodType
-                {
-                    Id = 2,
-                    Name = "Double Pod",
-                    Description = "Pod for two.",
-                    Price = 20000
-                },
-                new PodType
-                {
-                    Id = 3,
-                    Name = "Premium Pod",
-                    Description = "Luxurious Pod.",
-                    Price = 50000
-                });
+            //modelBuilder.Entity<PodType>().HasData(
+            //    new PodType
+            //    {
+            //        Id = 1,
+            //        Name = "Single Pod",
+            //        Description = "Pod for one.",
+            //        Price = 10000
+            //    },
+            //    new PodType
+            //    {
+            //        Id = 2,
+            //        Name = "Double Pod",
+            //        Description = "Pod for two.",
+            //        Price = 20000
+            //    },
+            //    new PodType
+            //    {
+            //        Id = 3,
+            //        Name = "Premium Pod",
+            //        Description = "Luxurious Pod.",
+            //        Price = 50000
+            //    });
 
-            modelBuilder.Entity<Pod>().HasData(
-                new Pod
-                {
-                    Id = 1,
-                    Name = "Pod 1",
-                    Description = "Clean Pod",
-                    Status = 1,
-                    PodTypeId = 1,
-                    AreaId = 1
-                }, new Pod
-                {
-                    Id = 2,
-                    Name = "Pod 2",
-                    Description = "Nice Pod",
-                    Status = 1,
-                    PodTypeId = 2,
-                    AreaId = 1
-                }, new Pod
-                {
-                    Id = 3,
-                    Name = "Pod 3",
-                    Description = "Premium Pod",
-                    Status = 1,
-                    PodTypeId = 3,
-                    AreaId = 1
-                });
+            //modelBuilder.Entity<Pod>().HasData(
+            //    new Pod
+            //    {
+            //        Id = 1,
+            //        Name = "Pod 1",
+            //        Description = "Clean Pod",
+            //        Status = 1,
+            //        PodTypeId = 1,
+            //        AreaId = 1
+            //    }, new Pod
+            //    {
+            //        Id = 2,
+            //        Name = "Pod 2",
+            //        Description = "Nice Pod",
+            //        Status = 1,
+            //        PodTypeId = 2,
+            //        AreaId = 1
+            //    }, new Pod
+            //    {
+            //        Id = 3,
+            //        Name = "Pod 3",
+            //        Description = "Premium Pod",
+            //        Status = 1,
+            //        PodTypeId = 3,
+            //        AreaId = 1
+            //    });
 
-            modelBuilder.Entity<Schedule>().HasData(
-                new Schedule
-                {
-                    Id = 1,
-                    StartTime = TimeOnly.FromTimeSpan(new TimeSpan(7, 0, 0)),
-                    EndTime = TimeOnly.FromTimeSpan(new TimeSpan(8, 0, 0)),
-                    Status = 1
-                },
-                new Schedule
-                {
-                    Id = 2,
-                    StartTime = TimeOnly.FromTimeSpan(new TimeSpan(8, 0, 0)),
-                    EndTime = TimeOnly.FromTimeSpan(new TimeSpan(9, 0, 0)),
-                    Status = 1
-                },
-                new Schedule
-                {
-                    Id = 3,
-                    StartTime = TimeOnly.FromTimeSpan(new TimeSpan(9, 0, 0)),
-                    EndTime = TimeOnly.FromTimeSpan(new TimeSpan(10, 0, 0)),
-                    Status = 1
-                },
-                new Schedule
-                {
-                    Id = 4,
-                    StartTime = TimeOnly.FromTimeSpan(new TimeSpan(10, 0, 0)),
-                    EndTime = TimeOnly.FromTimeSpan(new TimeSpan(11, 0, 0)),
-                    Status = 1
-                });
+            //modelBuilder.Entity<Schedule>().HasData(
+            //    new Schedule
+            //    {
+            //        Id = 1,
+            //        StartTime = TimeOnly.FromTimeSpan(new TimeSpan(7, 0, 0)),
+            //        EndTime = TimeOnly.FromTimeSpan(new TimeSpan(8, 0, 0)),
+            //        Status = 1
+            //    },
+            //    new Schedule
+            //    {
+            //        Id = 2,
+            //        StartTime = TimeOnly.FromTimeSpan(new TimeSpan(8, 0, 0)),
+            //        EndTime = TimeOnly.FromTimeSpan(new TimeSpan(9, 0, 0)),
+            //        Status = 1
+            //    },
+            //    new Schedule
+            //    {
+            //        Id = 3,
+            //        StartTime = TimeOnly.FromTimeSpan(new TimeSpan(9, 0, 0)),
+            //        EndTime = TimeOnly.FromTimeSpan(new TimeSpan(10, 0, 0)),
+            //        Status = 1
+            //    },
+            //    new Schedule
+            //    {
+            //        Id = 4,
+            //        StartTime = TimeOnly.FromTimeSpan(new TimeSpan(10, 0, 0)),
+            //        EndTime = TimeOnly.FromTimeSpan(new TimeSpan(11, 0, 0)),
+            //        Status = 1
+            //    });
 
             //SEEDING DATA - DO NOT CHANGE WITHOUT GROUP CONSENT
             //TABLE ROLE
@@ -304,58 +304,58 @@ namespace Repositories
                 new Role { Id = 3, Name = "Manager" },
                 new Role { Id = 4, Name = "Admin" }
             );
-            //TABLE MEMBERSHIP
-            modelBuilder.Entity<Membership>().HasData(
-                new Membership { Id = 1, Name = "N/A", Description = "N/A", Status = 1 },
-                new Membership { Id = 2, Name = "Regular", Description = "No bonuses", Status = 1 },
-                new Membership { Id = 3, Name = "VIP", Description = "VIPPRO", Status = 1 }
-            );
-            //TABLE USER
-            modelBuilder.Entity<User>().HasData(
-        new User
-        {
-            Id = 1,
-            Name = "CUSTOMER",
-            Email = "customer@gmail.com",
-            Password = "Customer@1234",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@1234"),
-            Status = 1,
-            MembershipId = 2,
-            RoleId = 1
-        },
-        new User
-        {
-            Id = 2,
-            Name = "STAFF",
-            Email = "staff@gmail.com",
-            Password = "Staff@1234",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Staff@1234"),
-            Status = 1,
-            MembershipId = 1,
-            RoleId = 2
-        },
-        new User
-        {
-            Id = 3,
-            Name = "MANAGER",
-            Email = "manager@gmail.com",
-            Password = "Manager@1234",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Manager@1234"),
-            Status = 1,
-            MembershipId = 1,
-            RoleId = 3
-        },
-        new User
-        {
-            Id = 4,
-            Name = "ADMIN",
-            Email = "admin@gmail.com",
-            Password = "Admin@1234",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@1234"),
-            Status = 1,
-            MembershipId = 1,
-            RoleId = 4
-        });
+        //    //TABLE MEMBERSHIP
+        //    modelBuilder.Entity<Membership>().HasData(
+        //        new Membership { Id = 1, Name = "N/A", Description = "N/A", Status = 1 },
+        //        new Membership { Id = 2, Name = "Regular", Description = "No bonuses", Status = 1 },
+        //        new Membership { Id = 3, Name = "VIP", Description = "VIPPRO", Status = 1 }
+        //    );
+        //    //TABLE USER
+        //    modelBuilder.Entity<User>().HasData(
+        //new User
+        //{
+        //    Id = 1,
+        //    Name = "CUSTOMER",
+        //    Email = "customer@gmail.com",
+        //    Password = "Customer@1234",
+        //    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@1234"),
+        //    Status = 1,
+        //    MembershipId = 2,
+        //    RoleId = 1
+        //},
+        //new User
+        //{
+        //    Id = 2,
+        //    Name = "STAFF",
+        //    Email = "staff@gmail.com",
+        //    Password = "Staff@1234",
+        //    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Staff@1234"),
+        //    Status = 1,
+        //    MembershipId = 1,
+        //    RoleId = 2
+        //},
+        //new User
+        //{
+        //    Id = 3,
+        //    Name = "MANAGER",
+        //    Email = "manager@gmail.com",
+        //    Password = "Manager@1234",
+        //    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Manager@1234"),
+        //    Status = 1,
+        //    MembershipId = 1,
+        //    RoleId = 3
+        //},
+        //new User
+        //{
+        //    Id = 4,
+        //    Name = "ADMIN",
+        //    Email = "admin@gmail.com",
+        //    Password = "Admin@1234",
+        //    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@1234"),
+        //    Status = 1,
+        //    MembershipId = 1,
+        //    RoleId = 4
+        //});
         }
     }
 }

@@ -103,9 +103,10 @@ namespace Services.Implement
                 Email = dto.Email,
                 Password = dto.Password,
                 PasswordHash = passwordHash,
-                Status = 0,
-                MembershipId = 1,
+                Status = 1,
+                MembershipId = 5,
                 RoleId = dto.RoleId,
+                LoyaltyPoints = 0
             };
 
             await _userRepo.AddAsync(newUser);
@@ -137,8 +138,9 @@ namespace Services.Implement
                 Password = "Password@123456",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password@123456"),
                 Status = 1,
-                MembershipId = 1,
+                MembershipId = 4,
                 RoleId = 2,
+                LoyaltyPoints = -1
             };
 
             await _userRepo.AddAsync(newUser);
